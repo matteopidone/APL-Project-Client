@@ -27,7 +27,7 @@ namespace APL_Project_Client
             bool response = true;
             if (response)
             {
-                Form1 loginForm = new Form1();
+                Login loginForm = new Login();
                 loginForm.Show();
                 this.Hide();
             }

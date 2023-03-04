@@ -30,6 +30,12 @@ namespace APL_Project_Client
 
             if (nomeUtente.Length != 0 && password.Length != 0 && isValidEmail)
             {
+
+                progressBar1.Style = ProgressBarStyle.Marquee;
+                progressBar1.MarqueeAnimationSpeed = 30;
+                progressBar1.Visible = true;
+                
+
                 using (var client = new HttpClient())
                 {
                     //var parameters = new Dictionary<string, string> { { "nome_utente", nomeUtente }, { "password", hashedPassword } };
@@ -42,12 +48,15 @@ namespace APL_Project_Client
                         // Apri il form di login completato
                         Home homeForm = new Home();
                         homeForm.Show();
-                        this.Hide();
+                         this.Hide();
                     }
                     else
                     {
                         // Visualizza un messaggio di errore
                         MessageBox.Show("Username o Password errati, riprova o contatta il tuo datore di lavoro", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        progressBar1.Value = 0;
+                        progressBar1.Visible = false;
+
 
                     }
                 }
@@ -55,6 +64,9 @@ namespace APL_Project_Client
             } else
             {
                 MessageBox.Show("Inserisci tutti i dati o inserisci una mail valida", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                progressBar1.Value = 0;
+                progressBar1.Visible = false;
+
             }
         }
 

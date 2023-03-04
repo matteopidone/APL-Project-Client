@@ -1,3 +1,9 @@
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+using System.Text.RegularExpressions;
+using System.Security.Cryptography;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using System.Text;
+
 namespace APL_Project_Client
 {
     public partial class Login : Form
@@ -12,21 +18,43 @@ namespace APL_Project_Client
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
-            String username, password;
-            
-            username= this.textBox1.Text;
-            password= this.textBox2.Text;
+            String nomeUtente = this.textBox1.Text;
+            String password = this.textBox2.Text;
+            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+            byte[] hashedBytes = new SHA256Managed().ComputeHash(passwordBytes);
+            string hashedPassword = Convert.ToBase64String(hashedBytes);
 
-            if (username.Length !=0 && password.Length !=0)
+            bool isValidEmail = Regex.IsMatch(nomeUtente, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+
+            if (nomeUtente.Length != 0 && password.Length != 0 && isValidEmail)
             {
-                Home homeForm = new Home();
-                homeForm.Show();
-                this.Hide();
+                using (var client = new HttpClient())
+                {
+                    //var parameters = new Dictionary<string, string> { { "nome_utente", nomeUtente }, { "password", hashedPassword } };
+                    //var content = new FormUrlEncodedContent(parameters);
+                    //var response = await client.PostAsync("https://api.example.com/login", content);
+                    //var responseString = await response.Content.ReadAsStringAsync();
+                    var responseString = "true";
+                    if (responseString == "true")
+                    {
+                        // Apri il form di login completato
+                        Home homeForm = new Home();
+                        homeForm.Show();
+                        this.Hide();
+                    }
+                    else
+                    {
+                        // Visualizza un messaggio di errore
+                        MessageBox.Show("Username o Password errati, riprova o contatta il tuo datore di lavoro", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    }
+                }
+
             } else
             {
-                MessageBox.Show("Username o Password errati, riprova o contatta il tuo datore di lavoro", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Inserisci tutti i dati o inserisci una mail valida", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

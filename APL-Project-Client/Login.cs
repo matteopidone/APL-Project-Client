@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using System.Text;
+using APL_Project_Client.Model;
 
 namespace APL_Project_Client
 {
@@ -46,7 +47,7 @@ namespace APL_Project_Client
                     if (responseString == "true")
                     {
                         // Apri il form di login completato
-                        Home homeForm = new Home();
+                        Home homeForm = new Home( new Dipendente("Matteo", "Pidone", "pidonematteo@hotmail.it") );
                         homeForm.Show();
                          this.Hide();
                     }

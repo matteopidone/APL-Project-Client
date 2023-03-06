@@ -7,6 +7,7 @@ public class Dipendente
     public string cognome;
     public string email;
     private List<Ferie> listFerie;
+    public event EventHandler<List<DateTime>> HolidaysReceived; 
     public Dipendente(string nome, string cognome, string email)
 	{
         this.nome = nome;
@@ -15,24 +16,51 @@ public class Dipendente
 
 	}
 
-    public List<DateTime> getGiorniFerie()
+    private List<DateTime> getHolidaysDays()
     {
-        if( listFerie != null )
+        List<DateTime> d = new List<DateTime>();
+        if(listFerie != null) 
+        {   
+            foreach( Ferie holiday in listFerie )
+            {
+                d.Add(holiday.date);
+            }
+        
+        }
+        return d;
+    
+    } 
+
+    public async Task<bool> fetchHolidays()
+    {
+        if( listFerie == null )
         {
-            //Thread.Sleep(3000);
-            return new List<DateTime>();
-            //chiamata http che valorizza e ritorna
-        } else
-        {
-            //Thread.Sleep(3000);
-            /*foreach (Ferie ferie in listFerie)
-            {            
-            }*/
+            //chiamata http che valorizza e ritorna, poi aggiorno la lista di ferie
+            //this.listFerie = ecc
             List<DateTime> d = new List<DateTime>();
             d.Add(new DateTime(2023, 3, 11));
             d.Add(new DateTime(2023, 3, 14));
-            d.Add(new DateTime(2023, 3, 16));
-            return d;
+            d.Add(new DateTime(2023, 3, 17));
+
+            await Task.Delay(3000);
+            if( HolidaysReceived != null)
+            {
+                HolidaysReceived(this, d);
+            }
+            return true;
+        } else
+        {
+            await Task.Delay(3000);
+            //List<DateTime> = this.getHolidaysDays();
+            List<DateTime> d = new List<DateTime>();
+            d.Add(new DateTime(2023, 3, 11));
+            d.Add(new DateTime(2023, 3, 14));
+            d.Add(new DateTime(2023, 3, 17));
+            if (HolidaysReceived != null)
+            {
+                HolidaysReceived(this, d);
+            }
+            return true;
         }
     }
 

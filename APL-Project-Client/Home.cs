@@ -36,17 +36,15 @@ namespace APL_Project_Client
                 this.Hide();
             }
         }
-        //Questo qui dovrebbe essere asynch
-        private void Home_Load(object sender, EventArgs e)
+        
+        private void HolidaysReceiveHandler(object sender, List<DateTime> e)
         {
-            // Fare un metodo che, richieda tutti i giorni di ferie, ed all'arrivo, tramite un evento custom magari, invochi coloorizeDate
-            // Per la lista di date che passiamo in input e dopo mostriamo il calendario
-            //Questo qui è un metodo asincrono no?  io vorrei che tuttti partissero e quando completano fanno tutto, in maniera non bloccante
-            
-            List<DateTime> date = d.getGiorniFerie();
-
-            this.ColorizeDates(date, Color.Red);
-
+            this.ColorizeDates(e, Color.Red);
+        }
+        private async void Home_Load(object sender, EventArgs e)
+        {
+            d.HolidaysReceived += this.HolidaysReceiveHandler;
+            var boolean = await d.fetchHolidays();
 
         }
 

@@ -6,14 +6,18 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
 
 namespace APL_Project_Client
 {
     public partial class Home : Form
     {
         Dipendente d;
+        private DateTime dateSelected;
+        SemaphoreSlim semaphoreSendRequest = new SemaphoreSlim(1);
         public Home(Dipendente d1)
         {
             InitializeComponent();
@@ -40,6 +44,8 @@ namespace APL_Project_Client
         private void HolidaysReceiveHandler(object sender, List<DateTime> e)
         {
             this.ColorizeDates(e, Color.Red);
+            this.progressBar1.Visible = false;
+            this.monthCalendar1.Visible = true;
         }
         private async void Home_Load(object sender, EventArgs e)
         {
@@ -50,10 +56,13 @@ namespace APL_Project_Client
 
         private void monthCalendar1_DateChanged(object sender, DateRangeEventArgs e)
         {
-            DateTime date = e.Start;
-            if( ! d.isGiornoFerie(date) && ! IsWeekend(date) )
+            DateTime date = e.Start; 
+            if( ! d.isGiornoFerie(date) && ! IsWeekend(date) && semaphoreSendRequest.CurrentCount == 1 ) //aggiungere condizione che la data non sia tra le richieste e che non sia prima di oggi
             {
-                this.label3.Text = "Vuoi procedere alla richiesta per giorno " + date.ToString("d") + "?";
+                //Sta nello Stack o nell'heap, sto copiando l'intera struttura oppure sto copiando il riferimento
+                //E' un tipo valore, sto copiando l'intera struttura
+                dateSelected = date;
+                this.label3.Text = "Vuoi procedere alla richiesta per giorno " + dateSelected.ToString("d") + "?";
                 this.button2.Visible = true;
                 this.label3.Visible = true;
 
@@ -62,6 +71,7 @@ namespace APL_Project_Client
                 this.button2.Visible = false;
                 this.label3.Visible = false;
             }
+
         }
 
         private bool IsWeekend(DateTime date)
@@ -95,9 +105,53 @@ namespace APL_Project_Client
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void button2_Click(object sender, EventArgs e)
         {
+            if(this.dateSelected != null)
+            {
+                try
+                {
+                    //Inlobare queste cose in un metodo, o inglobare i due compoenenti in un compoenente, non lo sos
+                    this.label3.Visible = false;
+                    this.button2.Visible = false;
+                    this.progressBar2.Visible = true;
+                    await semaphoreSendRequest.WaitAsync();
+                    bool response = await d.sendHolidayRequest(this.dateSelected);
+                    //Inserire una progress bar
+                    //Richiesta http per richiedere il giorno di ferie
+                    if (response)
+                    {
+                        this.label3.Text = "Richiesta di ferie inoltrata con successo!";
+                        this.progressBar2.Visible = false;
+                        this.label3.Visible = true;
+                        //Posso invocare un evento che vada ad aggiornare il listato di ferie preso (ordinato per data) e magari riutilizzare logiche e meccanismi di load di questo "componente"
+                        //Se faccio un componente custom, posso omagari passare al load una lista di ferie, e quando la richiamo magari passo la vecchia lista in add col valore nuovo
+                        //Disaccoppiando il render del componente alle logiche di poolamento che ci stanno dietro
+                        //UpdateListFerie(response)
+                    }
+                    else
+                    {
+                        this.label3.Text = "Impossibile inoltrare la richiesta.";
+                        this.progressBar2.Visible = false;
+                        this.label3.Visible = true;
+                        //RequestError()
 
+                    }
+                }
+                finally
+                {
+                    semaphoreSendRequest.Release();
+                }
+
+            }
+            else
+            {
+                this.label3.Text = "Impossibile inoltrare la richiesta.";
+                this.progressBar2.Visible = false;
+                this.label3.Visible = true;
+                //Invocare un metodo che è invocato sia nel caso di fallimento della chiamata http, sia se ce'è un'inconsistenza
+                //RequestError()
+            }
         }
     }
 }

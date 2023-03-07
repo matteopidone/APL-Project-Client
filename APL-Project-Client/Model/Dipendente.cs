@@ -6,13 +6,19 @@ public class Dipendente
     public string nome;
     public string cognome;
     public string email;
+
     private List<Ferie> listFerie;
-    public event EventHandler<List<DateTime>> HolidaysReceived; 
+    private List<Ferie> listRequest;
+
+    public event EventHandler<List<DateTime>> HolidaysReceived;
+    public event EventHandler<DateTime> RequestHolidaysUpdated;
     public Dipendente(string nome, string cognome, string email)
 	{
         this.nome = nome;
         this.cognome = cognome; 
         this.email = email;
+        this.listRequest = new List<Ferie>();// questa qui andrà sostituita da una fetch
+        this.listFerie= new List<Ferie>();
 
 	}
 
@@ -33,42 +39,55 @@ public class Dipendente
 
     public async Task<bool> fetchHolidays()
     {
-        if( listFerie == null )
+        if( listFerie.Count == 0 )
         {
             //chiamata http che valorizza e ritorna, poi aggiorno la lista di ferie
-            //this.listFerie = ecc
-            List<DateTime> d = new List<DateTime>();
-            d.Add(new DateTime(2023, 3, 11));
-            d.Add(new DateTime(2023, 3, 14));
-            d.Add(new DateTime(2023, 3, 17));
+            this.listFerie.Add(new Ferie(11, 3, 2023, "mot"));
+            this.listFerie.Add(new Ferie(14, 3, 2023, "mot"));
+            this.listFerie.Add(new Ferie(17, 3, 2023, "mot"));
 
             await Task.Delay(3000);
             if( HolidaysReceived != null)
             {
-                HolidaysReceived(this, d);
+                HolidaysReceived(this, getHolidaysDays());
             }
             return true;
         } else
         {
             await Task.Delay(3000);
-            //List<DateTime> = this.getHolidaysDays();
-            List<DateTime> d = new List<DateTime>();
-            d.Add(new DateTime(2023, 3, 11));
-            d.Add(new DateTime(2023, 3, 14));
-            d.Add(new DateTime(2023, 3, 17));
+            this.listFerie.Add(new Ferie(11, 3, 2023, "mot"));
+            this.listFerie.Add(new Ferie(14, 3, 2023, "mot"));
+            this.listFerie.Add(new Ferie(17, 3, 2023, "mot"));
             if (HolidaysReceived != null)
             {
-                HolidaysReceived(this, d);
+                HolidaysReceived(this, getHolidaysDays());
             }
             return true;
         }
     }
 
+    public async Task<bool> sendHolidayRequest(DateTime date)
+    {
+        await  Task.Delay(4000);
+        bool updated = true;
+        if (updated)
+        {
+            Ferie f = new Ferie(date.Day, date.Month, date.Year, "Motivation");
+            listRequest.Add(f);
+            if (RequestHolidaysUpdated != null)
+            {
+                RequestHolidaysUpdated(this, date);
+            }
+            return true;
+        }
+        return false;
+    }
+
     public bool isGiornoFerie(DateTime date)
     {
-        if( listFerie != null)
+        if( listFerie.Count != 0)
         {
-        return !this.listFerie.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
+        return this.listFerie.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
         }
         return false;
     }

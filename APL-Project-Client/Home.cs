@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -47,29 +48,42 @@ namespace APL_Project_Client
             this.progressBar1.Visible = false;
             this.monthCalendar1.Visible = true;
         }
+        private void RequestHolidaysUpdatedHandler(object sender, List<Ferie> e)
+        {
+            dataGridView1.DataSource = e;
+            dataGridView1.Visible = true;
+        }
         private async void Home_Load(object sender, EventArgs e)
         {
             d.HolidaysReceived += this.HolidaysReceiveHandler;
+            d.RequestHolidaysUpdated += this.RequestHolidaysUpdatedHandler;
             var boolean = await d.fetchHolidays();
 
         }
 
         private void monthCalendar1_DateChanged(object sender, DateRangeEventArgs e)
         {
-            DateTime date = e.Start; 
-            if( ! d.isGiornoFerie(date) && ! IsWeekend(date) && semaphoreSendRequest.CurrentCount == 1 ) //aggiungere condizione che la data non sia tra le richieste e che non sia prima di oggi
+            DateTime date = e.Start;
+            if(semaphoreSendRequest.CurrentCount == 1)
             {
-                //Sta nello Stack o nell'heap, sto copiando l'intera struttura oppure sto copiando il riferimento
-                //E' un tipo valore, sto copiando l'intera struttura
-                dateSelected = date;
-                this.label3.Text = "Vuoi procedere alla richiesta per giorno " + dateSelected.ToString("d") + "?";
-                this.button2.Visible = true;
-                this.label3.Visible = true;
+                if( d.RequestContainsDate(date) )
+                {
+                    this.label3.Text = "Hai già effettuato la richiesta per giorno " + date.ToString("d");
+                    this.label3.Visible = true;
+                }
+                else if( ! d.isGiornoFerie(date) && ! IsWeekend(date) && date > DateTime.Now )
+                {
+                    dateSelected = date;
+                    this.label3.Text = "Vuoi procedere alla richiesta per giorno " + dateSelected.ToString("d") + "?";
+                    this.button2.Visible = true;
+                    this.label3.Visible = true;
 
-            } else {
-                this.label3.Text = "";
-                this.button2.Visible = false;
-                this.label3.Visible = false;
+                } else {
+                    this.label3.Text = "";
+                    this.button2.Visible = false;
+                    this.label3.Visible = false;
+                }
+
             }
 
         }
@@ -152,6 +166,16 @@ namespace APL_Project_Client
                 //Invocare un metodo che è invocato sia nel caso di fallimento della chiamata http, sia se ce'è un'inconsistenza
                 //RequestError()
             }
+        }
+
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

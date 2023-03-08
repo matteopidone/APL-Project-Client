@@ -8,7 +8,7 @@ namespace APL_Project_Client.Model;
 public class Ferie
 {
     public DateTime date { get; set; }
-    private string motivation;
+    public string motivation { get; set; }
     public Ferie(int day, int month, int year, string motivation)
     {
         date = new DateTime(year, month, day);  

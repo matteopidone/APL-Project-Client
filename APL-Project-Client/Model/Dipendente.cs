@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 
 namespace APL_Project_Client.Model;
 public class Dipendente
@@ -11,7 +12,7 @@ public class Dipendente
     private List<Ferie> listRequest;
 
     public event EventHandler<List<DateTime>> HolidaysReceived;
-    public event EventHandler<DateTime> RequestHolidaysUpdated;
+    public event EventHandler<List<Ferie>> RequestHolidaysUpdated;
     public Dipendente(string nome, string cognome, string email)
 	{
         this.nome = nome;
@@ -51,6 +52,11 @@ public class Dipendente
             {
                 HolidaysReceived(this, getHolidaysDays());
             }
+            //Togliere, solo test evento
+            if (RequestHolidaysUpdated != null)
+            {
+                RequestHolidaysUpdated(this, listFerie);
+            }
             return true;
         } else
         {
@@ -61,6 +67,11 @@ public class Dipendente
             if (HolidaysReceived != null)
             {
                 HolidaysReceived(this, getHolidaysDays());
+            }
+            //Togliere, solo test evento
+            if (RequestHolidaysUpdated != null)
+            {
+                RequestHolidaysUpdated(this, listFerie);
             }
             return true;
         }
@@ -74,10 +85,10 @@ public class Dipendente
         {
             Ferie f = new Ferie(date.Day, date.Month, date.Year, "Motivation");
             listRequest.Add(f);
-            if (RequestHolidaysUpdated != null)
+            /*if (RequestHolidaysUpdated != null)
             {
                 RequestHolidaysUpdated(this, date);
-            }
+            }*/
             return true;
         }
         return false;
@@ -91,10 +102,18 @@ public class Dipendente
         }
         return false;
     }
+    //Simile a quello sopra
+    public bool RequestContainsDate(DateTime date)
+    {
+        if (listRequest.Count != 0)
+        {
+            return this.listRequest.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
+        }
+        return false;
+    }
 
     public List<Dipendente> getDipendentiPresenti(DateTime date)
     {
         return new List<Dipendente>();
-    } 
-
+    }
 }

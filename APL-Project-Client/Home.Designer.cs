@@ -129,19 +129,22 @@
             // 
             // dataGridView1
             // 
+            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridView1.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(18, 378);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 29;
-            this.dataGridView1.Size = new System.Drawing.Size(278, 145);
+            this.dataGridView1.Size = new System.Drawing.Size(417, 186);
             this.dataGridView1.TabIndex = 8;
             this.dataGridView1.Visible = false;
             // 
             // ferieBindingSource
             // 
             this.ferieBindingSource.DataSource = typeof(APL_Project_Client.Model.Ferie);
+            this.ferieBindingSource.CurrentChanged += new System.EventHandler(this.ferieBindingSource_CurrentChanged);
             // 
             // Home
             // 

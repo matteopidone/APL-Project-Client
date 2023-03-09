@@ -177,5 +177,10 @@ namespace APL_Project_Client
         {
 
         }
+
+        private void ferieBindingSource_CurrentChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

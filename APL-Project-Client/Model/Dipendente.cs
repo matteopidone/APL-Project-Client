@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
@@ -43,59 +44,72 @@ public class Dipendente
 
     public async Task<bool> fetchHolidays()
     {
-        //chiamata http che valorizza e ritorna, poi aggiorno la lista di ferie
-        //Sulla base dello stato, li metto nella Lista corretta, successivamente richiamo i 3 eventi
-        /*
-        for (ogni elemento ricevuto)
+        try
         {
-            int stato;
-            if(stato == StatoFerie.Richieste)
+            var client = new HttpClient();
+            var uriBuilder = new UriBuilder("http://151.97.115.169:9000/api/getHolidays");
+            uriBuilder.Query = "email=" + email;
+            var response = await client.GetAsync(uriBuilder.ToString());
+            if (response.IsSuccessStatusCode)
             {
-                Ferie f = new Ferie()
-                listRequest.Add(f);
-            } else if(stato == StatoFerie.Accettate)
-            {
-                Ferie f = new Ferie();
-                f.ApprovaFerie()
-                listFerie.Add(f);
+                var content = await response.Content.ReadAsStringAsync();
+                dynamic json = JsonConvert.DeserializeObject(content);
+
+                foreach(var holiday in json)
+                {
+                    if (holiday.type == StatoFerie.Richieste)
+                    {
+                        int day = holiday.day;
+                        int month = holiday.month;
+                        int year = holiday.year;
+                        string motivation = holiday.message;
+                        Ferie f = new Ferie(day, month, year, motivation);
+                        listRequest.Add(f);
+                    } 
+                    else if(holiday.type == StatoFerie.Accettate)
+                    {
+                        int day = holiday.day;
+                        int month = holiday.month;
+                        int year = holiday.year;
+                        string motivation = holiday.message;
+                        Ferie f = new Ferie(day, month, year, motivation);
+                        f.ApprovaFerie();
+                        listFerie.Add(f);
+                    }
+                    else if (holiday.type == StatoFerie.Rifiutate)
+                    {
+                        int day = holiday.day;
+                        int month = holiday.month;
+                        int year = holiday.year;
+                        string motivation = holiday.message;
+                        Ferie f = new Ferie(day, month, year, motivation);
+                        f.RifiutaFerie();
+                        listRequestRefused.Add(f);
+                    }
+                }
+
             }
-            else if (0 == StatoFerie.Rifiutate)
+            else
             {
-                Ferie f = new Ferie();
-                f.RifiutaFerie()
-                listRefused.Add(f);s
 
             }
 
-        }*/
-        this.listFerie.Add(new Ferie(11, 3, 2023, "mot"));
-        this.listFerie.Add(new Ferie(14, 3, 2023, "mot"));
-        this.listFerie.Add(new Ferie(17, 3, 2023, "mot"));
-        Ferie f1 = new Ferie(1, 3, 2023, "mot");
-        f1.RifiutaFerie();
-        Ferie f2 = new Ferie(1, 3, 2023, "mot");
-        f2.RifiutaFerie();
-        Ferie f3 = new Ferie(1, 3, 2023, "mot");
-        f3.RifiutaFerie();
-        this.listRequestRefused.Add(f1);
-        this.listRequestRefused.Add(f2);
-        this.listRequestRefused.Add(f3);
-
-        this.listRequest.Add(new Ferie(21, 3, 2023, "mot"));
-        this.listRequest.Add(new Ferie(22, 3, 2023, "mot"));
-        this.listRequest.Add(new Ferie(23, 3, 2023, "mot"));
-
-        await Task.Delay(3000);
+        }
+        catch (HttpRequestException ex)
+        {
+            MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
         if( HolidaysReceived != null)
         {
             HolidaysReceived(this, getHolidaysDays());
         }
-        //Togliere, solo test evento
         if (RequestHolidaysUpdated != null)
         {
-            //Vengono unite la lista di ferie ancora richieste e quelle rifiutate, ordinate per data.
             RequestHolidaysUpdated(this, getHolidaysRequestedAndRefused());
-            //RequestHolidaysUpdated(this, new List<Ferie>());
         }
         return true;
     }

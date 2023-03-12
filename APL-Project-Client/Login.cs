@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using System.Text;
+using Newtonsoft.Json;
 using APL_Project_Client.Model;
 
 namespace APL_Project_Client
@@ -21,11 +22,12 @@ namespace APL_Project_Client
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            String nomeUtente = this.textBox1.Text;
-            String password = this.textBox2.Text;
-            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-            byte[] hashedBytes = new SHA256Managed().ComputeHash(passwordBytes);
-            string hashedPassword = Convert.ToBase64String(hashedBytes);
+            string nomeUtente = this.textBox1.Text;
+            string password = this.textBox2.Text;
+            //byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+            //byte[] hashedBytes = new SHA256Managed().ComputeHash(passwordBytes);
+            //string hashedPassword = Convert.ToBase64String(hashedBytes);
+            string hashedPassword = password;
 
             bool isValidEmail = Regex.IsMatch(nomeUtente, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
 
@@ -36,30 +38,51 @@ namespace APL_Project_Client
                 progressBar1.MarqueeAnimationSpeed = 30;
                 progressBar1.Visible = true;
                 
-
-                using (var client = new HttpClient())
+                try 
                 {
-                    //var parameters = new Dictionary<string, string> { { "nome_utente", nomeUtente }, { "password", hashedPassword } };
-                    //var content = new FormUrlEncodedContent(parameters);
-                    //var response = await client.PostAsync("https://api.example.com/login", content);
-                    //var responseString = await response.Content.ReadAsStringAsync();
-                    var responseString = "true";
-                    if (responseString == "true")
+                    var client = new HttpClient();
+                    var parameters = new Dictionary<string, string> { { "email", nomeUtente }, { "password", hashedPassword } };
+                    string jsonRequest = JsonConvert.SerializeObject(parameters);
+                    HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync("http://localhost:9000/api/login", content);
+                    if (response.IsSuccessStatusCode)
                     {
-                        // Apri il form di login completato
-                        Home homeForm = new Home( new Dipendente("Matteo", "Pidone", "pidonematteo@hotmail.it") );
-                        homeForm.Show();
-                         this.Hide();
-                    }
-                    else
+                        string result = await response.Content.ReadAsStringAsync();
+                        dynamic json = JsonConvert.DeserializeObject(result);
+                        if ((bool)json.found)
+                        {
+                            string name = json.name;
+                            string surname = json.surname;
+                            string email = json.email;
+                            Home homeForm = new Home( new Dipendente(name, surname, email) );
+                            homeForm.Show();
+                            this.Hide();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Username o Password errati, riprova o contatta il tuo datore di lavoro", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            progressBar1.Value = 0;
+                            progressBar1.Visible = false;
+                        }
+
+                    } else
                     {
-                        // Visualizza un messaggio di errore
-                        MessageBox.Show("Username o Password errati, riprova o contatta il tuo datore di lavoro", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Sistema non disponibile, riprovare più tardi.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         progressBar1.Value = 0;
                         progressBar1.Visible = false;
-
-
                     }
+
+                } catch (HttpRequestException ex)
+                {
+                    MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    progressBar1.Value = 0;
+                    progressBar1.Visible = false;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    progressBar1.Value = 0;
+                    progressBar1.Visible = false;
                 }
 
             } else

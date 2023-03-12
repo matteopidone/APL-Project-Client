@@ -24,9 +24,9 @@ public class Dipendente
         this.nome = nome;
         this.cognome = cognome; 
         this.email = email;
-        this.listRequestPending = new List<Ferie>();
-        this.listHolidaysAccepted= new List<Ferie>();
-        this.listHolidaysRefused = new List<Ferie>();
+        listRequestPending = new List<Ferie>();
+        listHolidaysAccepted= new List<Ferie>();
+        listHolidaysRefused = new List<Ferie>();
 
     }
 
@@ -138,7 +138,7 @@ public class Dipendente
     {
         if( listHolidaysAccepted.Count != 0)
         {
-        return this.listHolidaysAccepted.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
+        return listHolidaysAccepted.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
         }
         return false;
     }
@@ -147,7 +147,7 @@ public class Dipendente
     {
         if (listRequestPending.Count != 0)
         {
-            return this.listRequestPending.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
+            return listRequestPending.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
         }
         return false;
     }

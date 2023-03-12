@@ -10,9 +10,12 @@ public class Dipendente
     public string cognome;
     public string email;
 
-    private List<Ferie> listFerie;
-    private List<Ferie> listRequest;
-    private List<Ferie> listRequestRefused;
+    // Lista di richieste di ferie accettate.
+    private List<Ferie> listHolidaysAccepted;
+    // Lista di richieste di ferie in attesa.
+    private List<Ferie> listRequestPending;
+    // Lista di richiese di ferie rifiutate.
+    private List<Ferie> listHolidaysRefused;
 
     public event EventHandler<List<DateTime>> HolidaysReceived;
     public event EventHandler<List<Ferie>> RequestHolidaysUpdated;
@@ -21,18 +24,18 @@ public class Dipendente
         this.nome = nome;
         this.cognome = cognome; 
         this.email = email;
-        this.listRequest = new List<Ferie>();
-        this.listFerie= new List<Ferie>();
-        this.listRequestRefused = new List<Ferie>();
+        this.listRequestPending = new List<Ferie>();
+        this.listHolidaysAccepted= new List<Ferie>();
+        this.listHolidaysRefused = new List<Ferie>();
 
     }
 
     private List<DateTime> getHolidaysDays()
     {
         List<DateTime> d = new List<DateTime>();
-        if(listFerie != null) 
+        if(listHolidaysAccepted != null) 
         {   
-            foreach( Ferie holiday in listFerie )
+            foreach( Ferie holiday in listHolidaysAccepted )
             {
                 d.Add(holiday.date);
             }
@@ -47,7 +50,7 @@ public class Dipendente
         try
         {
             var client = new HttpClient();
-            var uriBuilder = new UriBuilder("http://151.97.115.169:9000/api/getHolidays");
+            var uriBuilder = new UriBuilder("http://localhost:9000/api/getHolidays");
             uriBuilder.Query = "email=" + email;
             var response = await client.GetAsync(uriBuilder.ToString());
             if (response.IsSuccessStatusCode)
@@ -64,7 +67,7 @@ public class Dipendente
                         int year = holiday.year;
                         string motivation = holiday.message;
                         Ferie f = new Ferie(day, month, year, motivation);
-                        listRequest.Add(f);
+                        listRequestPending.Add(f);
                     } 
                     else if(holiday.type == StatoFerie.Accettate)
                     {
@@ -74,7 +77,7 @@ public class Dipendente
                         string motivation = holiday.message;
                         Ferie f = new Ferie(day, month, year, motivation);
                         f.ApprovaFerie();
-                        listFerie.Add(f);
+                        listHolidaysAccepted.Add(f);
                     }
                     else if (holiday.type == StatoFerie.Rifiutate)
                     {
@@ -84,7 +87,7 @@ public class Dipendente
                         string motivation = holiday.message;
                         Ferie f = new Ferie(day, month, year, motivation);
                         f.RifiutaFerie();
-                        listRequestRefused.Add(f);
+                        listHolidaysRefused.Add(f);
                     }
                 }
 
@@ -121,7 +124,7 @@ public class Dipendente
         if (updated)
         {
             Ferie f = new Ferie(date.Day, date.Month, date.Year, "Motivation");
-            listRequest.Add(f);
+            listRequestPending.Add(f);
             if (RequestHolidaysUpdated != null)
             {
                 RequestHolidaysUpdated(this, getHolidaysRequestedAndRefused());
@@ -133,18 +136,18 @@ public class Dipendente
 
     public bool isGiornoFerie(DateTime date)
     {
-        if( listFerie.Count != 0)
+        if( listHolidaysAccepted.Count != 0)
         {
-        return this.listFerie.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
+        return this.listHolidaysAccepted.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
         }
         return false;
     }
     //Simile a quello sopra
     public bool RequestContainsDate(DateTime date)
     {
-        if (listRequest.Count != 0)
+        if (listRequestPending.Count != 0)
         {
-            return this.listRequest.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
+            return this.listRequestPending.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
         }
         return false;
     }
@@ -156,6 +159,6 @@ public class Dipendente
 
     private List<Ferie> getHolidaysRequestedAndRefused()
     {
-        return listRequest.OrderBy(f => f.date).Concat(listRequestRefused.OrderBy(f => f.date)).ToList();
+        return listRequestPending.OrderBy(f => f.date).Concat(listHolidaysRefused.OrderBy(f => f.date)).ToList();
     }
 }

@@ -49,13 +49,13 @@ public class Dipendente
     {
         try
         {
-            var client = new HttpClient();
-            var uriBuilder = new UriBuilder("http://localhost:9000/api/getHolidays");
+            HttpClient client = new HttpClient();
+            UriBuilder uriBuilder = new UriBuilder("http://151.97.115.169:9000/api/getHolidays");
             uriBuilder.Query = "email=" + email;
-            var response = await client.GetAsync(uriBuilder.ToString());
+            HttpResponseMessage response = await client.GetAsync(uriBuilder.ToString());
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsStringAsync();
+                string content = await response.Content.ReadAsStringAsync(); 
                 dynamic json = JsonConvert.DeserializeObject(content);
 
                 foreach(var holiday in json)

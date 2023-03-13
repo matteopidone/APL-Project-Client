@@ -13,19 +13,19 @@ public enum StatoFerie
 }
 public interface IFerieState
 {
-    void ApprovaFerie(Ferie ferie);
-    void RifiutaFerie(Ferie ferie);
+    void HolidayApproved(Ferie ferie);
+    void HolidayRefused(Ferie ferie);
     StatoFerie GetStato();
 }
 
 public class FerieRichieste : IFerieState
 {
-    public void ApprovaFerie(Ferie ferie)
+    public void HolidayApproved(Ferie ferie)
     {
         ferie.Stato = new FerieAccettate();
     }
 
-    public void RifiutaFerie(Ferie ferie)
+    public void HolidayRefused(Ferie ferie)
     {
         ferie.Stato = new FerieRifiutate();
     }
@@ -37,12 +37,12 @@ public class FerieRichieste : IFerieState
 
 public class FerieAccettate : IFerieState
 {
-    public void ApprovaFerie(Ferie ferie)
+    public void HolidayApproved(Ferie ferie)
     {
         throw new InvalidOperationException("Le ferie sono già state accettate");
     }
 
-    public void RifiutaFerie(Ferie ferie)
+    public void HolidayRefused(Ferie ferie)
     {
         ferie.Stato = new FerieRifiutate();
     }
@@ -54,12 +54,12 @@ public class FerieAccettate : IFerieState
 
 public class FerieRifiutate : IFerieState
 {
-    public void ApprovaFerie(Ferie ferie)
+    public void HolidayApproved(Ferie ferie)
     {
         ferie.Stato = new FerieAccettate();
     }
 
-    public void RifiutaFerie(Ferie ferie)
+    public void HolidayRefused(Ferie ferie)
     {
         throw new InvalidOperationException("Le ferie sono già state rifiutate");
     }
@@ -105,14 +105,14 @@ public class Ferie
         this.motivation = motivation;
     }
 
-    public void ApprovaFerie()
+    public void HolidayApproved()
     {
-        stato.ApprovaFerie(this);
+        stato.HolidayApproved(this);
     }
 
-    public void RifiutaFerie()
+    public void HolidayRefused()
     {
-        stato.RifiutaFerie(this);
+        stato.HolidayRefused(this);
     }
 
     public IFerieState Stato

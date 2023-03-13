@@ -85,12 +85,12 @@ public class Dipendente
                         break;
 
                     case StatoFerie.Accettate :
-                        f.ApprovaFerie();
+                        f.HolidayApproved();
                         listHolidaysAccepted.Add(f);
                         break;
 
                     case StatoFerie.Rifiutate :
-                        f.RifiutaFerie();
+                        f.HolidayRefused();
                         listHolidaysRefused.Add(f);
                         break;
 

@@ -66,12 +66,12 @@ namespace APL_Project_Client
             DateTime date = e.Start;
             if(semaphoreSendRequest.CurrentCount == 1)
             {
-                if( d.RequestContainsDate(date) )
+                if( d.isHolidayPending(date) )
                 {
                     this.label3.Text = "Hai già effettuato la richiesta per giorno " + date.ToString("d");
                     this.label3.Visible = true;
                 }
-                else if( ! d.isGiornoFerie(date) && ! IsWeekend(date) && date > DateTime.Now )
+                else if( ! d.isHolidayAccepted(date) && ! IsWeekend(date) && date > DateTime.Now )
                 {
                     dateSelected = date;
                     this.label3.Text = "Vuoi procedere alla richiesta per giorno " + dateSelected.ToString("d") + "?";

@@ -72,37 +72,30 @@ public class Dipendente
 
             foreach(var holiday in json)
             {
-                if (holiday.type == StatoFerie.Richieste)
+                int day = holiday.day;
+                int month = holiday.month;
+                int year = holiday.year;
+                string motivation = holiday.message;
+                Ferie f = new Ferie(day, month, year, motivation);
+
+                switch ((StatoFerie)holiday.type)
                 {
-                    int day = holiday.day;
-                    int month = holiday.month;
-                    int year = holiday.year;
-                    string motivation = holiday.message;
-                    Ferie f = new Ferie(day, month, year, motivation);
-                    listRequestPending.Add(f);
-                } 
-                else if(holiday.type == StatoFerie.Accettate)
-                {
-                    int day = holiday.day;
-                    int month = holiday.month;
-                    int year = holiday.year;
-                    string motivation = holiday.message;
-                    Ferie f = new Ferie(day, month, year, motivation);
-                    f.ApprovaFerie();
-                    listHolidaysAccepted.Add(f);
-                }
-                else if (holiday.type == StatoFerie.Rifiutate)
-                {
-                    int day = holiday.day;
-                    int month = holiday.month;
-                    int year = holiday.year;
-                    string motivation = holiday.message;
-                    Ferie f = new Ferie(day, month, year, motivation);
-                    f.RifiutaFerie();
-                    listHolidaysRefused.Add(f);
+                    case StatoFerie.Richieste :
+                        listRequestPending.Add(f);
+                        break;
+
+                    case StatoFerie.Accettate :
+                        f.ApprovaFerie();
+                        listHolidaysAccepted.Add(f);
+                        break;
+
+                    case StatoFerie.Rifiutate :
+                        f.RifiutaFerie();
+                        listHolidaysRefused.Add(f);
+                        break;
+
                 }
             }
-
         }
         else
         {

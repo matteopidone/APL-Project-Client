@@ -50,7 +50,7 @@ public class Dipendente
         try
         {
             HttpClient client = new HttpClient();
-            UriBuilder uriBuilder = new UriBuilder("http://151.97.115.169:9000/api/getHolidays");
+            UriBuilder uriBuilder = new UriBuilder("http://localhost:9000/api/getHolidays");
             uriBuilder.Query = "email=" + email;
             HttpResponseMessage response = await client.GetAsync(uriBuilder.ToString());
             if (response.IsSuccessStatusCode)
@@ -119,37 +119,16 @@ public class Dipendente
 
     public async Task<bool> sendHolidayRequest(DateTime date)
     {
+        HttpResponseMessage response;
+        HttpClient client = new HttpClient();
+        Dictionary<string, object> parameters = new Dictionary<string, object> { { "email", email }, { "year", date.Year }, { "month", date.Month }, { "day", date.Day }, { "message", "motivation" } };
+        string jsonRequest = JsonConvert.SerializeObject(parameters);
+        HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
         try
         {
-            HttpClient client = new HttpClient();
-            Dictionary<string, object> parameters = new Dictionary<string, object> { { "email", email }, { "year", date.Year }, { "month", date.Month }, { "day", date.Day }, { "message", "motivation" } };
-            string jsonRequest = JsonConvert.SerializeObject(parameters);
-            HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("http://localhost:9000/api/insertHoliday", content);
-            if (response.IsSuccessStatusCode)
-            {
-                string Resultcontent = await response.Content.ReadAsStringAsync();
-                dynamic json = JsonConvert.DeserializeObject(Resultcontent);
-                if ((bool)json.result)
-                {
-                    Ferie f = new Ferie(date.Day, date.Month, date.Year, "Motivation");
-                    listRequestPending.Add(f);
-                    if (RequestHolidaysUpdated != null)
-                    {
-                        RequestHolidaysUpdated(this, getHolidaysRequestedAndRefused());
-                    }
-                    return true;
-                }
-            }
-            else
-            {
-                MessageBox.Show("Errore nella richiesta", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            return false;
-
-        }
-        catch (HttpRequestException ex)
+            response = await client.PostAsync("http://localhost:9000/api/insertHoliday", content);
+        
+        } catch (HttpRequestException ex)
         {
             MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return false;
@@ -159,6 +138,28 @@ public class Dipendente
             MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return false;
         }
+
+        if (response.IsSuccessStatusCode)
+        {
+            string Resultcontent = await response.Content.ReadAsStringAsync();
+            dynamic json = JsonConvert.DeserializeObject(Resultcontent);
+            if ((bool)json.result)
+            {
+                Ferie f = new Ferie(date.Day, date.Month, date.Year, "Motivation");
+                listRequestPending.Add(f);
+                if (RequestHolidaysUpdated != null)
+                {
+                    RequestHolidaysUpdated(this, getHolidaysRequestedAndRefused());
+                }
+                return true;
+            }
+        }
+        else
+        {
+            MessageBox.Show("Errore nella richiesta", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return false;
+        }
+        return false;
     }
 
     public bool isGiornoFerie(DateTime date)

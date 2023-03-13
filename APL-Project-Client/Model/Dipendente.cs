@@ -17,8 +17,8 @@ public class Dipendente
     // Lista di richiese di ferie rifiutate.
     private List<Ferie> listHolidaysRefused;
 
-    public event EventHandler<List<DateTime>> HolidaysReceived;
-    public event EventHandler<List<Ferie>> RequestHolidaysUpdated;
+    public event EventHandler<List<DateTime>> HolidaysAcceptedReceived;
+    public event EventHandler<List<Ferie>> HolidaysPendingUpdated;
     public Dipendente(string nome, string cognome, string email)
 	{
         this.nome = nome;
@@ -102,13 +102,13 @@ public class Dipendente
             MessageBox.Show("Errore generico nella richiesta", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        if( HolidaysReceived != null)
+        if( HolidaysAcceptedReceived != null)
         {
-            HolidaysReceived(this, getHolidaysDays());
+            HolidaysAcceptedReceived(this, getHolidaysDays());
         }
-        if (RequestHolidaysUpdated != null)
+        if (HolidaysPendingUpdated != null)
         {
-            RequestHolidaysUpdated(this, getHolidaysRequestedAndRefused());
+            HolidaysPendingUpdated(this, getHolidaysRequestedAndRefused());
         }
         return true;
     }
@@ -143,9 +143,9 @@ public class Dipendente
             {
                 Ferie f = new Ferie(date.Day, date.Month, date.Year, "Motivation");
                 listRequestPending.Add(f);
-                if (RequestHolidaysUpdated != null)
+                if (HolidaysPendingUpdated != null)
                 {
-                    RequestHolidaysUpdated(this, getHolidaysRequestedAndRefused());
+                    HolidaysPendingUpdated(this, getHolidaysRequestedAndRefused());
                 }
                 return true;
             }

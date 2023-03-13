@@ -55,8 +55,8 @@ namespace APL_Project_Client
         }
         private async void Home_Load(object sender, EventArgs e)
         {
-            d.HolidaysReceived += this.HolidaysReceiveHandler;
-            d.RequestHolidaysUpdated += this.RequestHolidaysUpdatedHandler;
+            d.HolidaysAcceptedReceived += this.HolidaysReceiveHandler;
+            d.HolidaysPendingUpdated += this.RequestHolidaysUpdatedHandler;
             var boolean = await d.fetchHolidays();
 
         }

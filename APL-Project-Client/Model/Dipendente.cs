@@ -47,65 +47,68 @@ public class Dipendente
 
     public async Task<bool> fetchHolidays()
     {
+        HttpResponseMessage response;
+        HttpClient client = new HttpClient();
+        UriBuilder uriBuilder = new UriBuilder("http://localhost:9000/api/getHolidays");
+        uriBuilder.Query = "email=" + email;
         try
         {
-            HttpClient client = new HttpClient();
-            UriBuilder uriBuilder = new UriBuilder("http://localhost:9000/api/getHolidays");
-            uriBuilder.Query = "email=" + email;
-            HttpResponseMessage response = await client.GetAsync(uriBuilder.ToString());
-            if (response.IsSuccessStatusCode)
-            {
-                string content = await response.Content.ReadAsStringAsync(); 
-                dynamic json = JsonConvert.DeserializeObject(content);
-
-                foreach(var holiday in json)
-                {
-                    if (holiday.type == StatoFerie.Richieste)
-                    {
-                        int day = holiday.day;
-                        int month = holiday.month;
-                        int year = holiday.year;
-                        string motivation = holiday.message;
-                        Ferie f = new Ferie(day, month, year, motivation);
-                        listRequestPending.Add(f);
-                    } 
-                    else if(holiday.type == StatoFerie.Accettate)
-                    {
-                        int day = holiday.day;
-                        int month = holiday.month;
-                        int year = holiday.year;
-                        string motivation = holiday.message;
-                        Ferie f = new Ferie(day, month, year, motivation);
-                        f.ApprovaFerie();
-                        listHolidaysAccepted.Add(f);
-                    }
-                    else if (holiday.type == StatoFerie.Rifiutate)
-                    {
-                        int day = holiday.day;
-                        int month = holiday.month;
-                        int year = holiday.year;
-                        string motivation = holiday.message;
-                        Ferie f = new Ferie(day, month, year, motivation);
-                        f.RifiutaFerie();
-                        listHolidaysRefused.Add(f);
-                    }
-                }
-
-            }
-            else
-            {
-
-            }
-
+            response = await client.GetAsync(uriBuilder.ToString());
         }
         catch (HttpRequestException ex)
         {
             MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return false;
         }
         catch (Exception ex)
         {
             MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return false;
         }
+        if (response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync(); 
+            dynamic json = JsonConvert.DeserializeObject(content);
+
+            foreach(var holiday in json)
+            {
+                if (holiday.type == StatoFerie.Richieste)
+                {
+                    int day = holiday.day;
+                    int month = holiday.month;
+                    int year = holiday.year;
+                    string motivation = holiday.message;
+                    Ferie f = new Ferie(day, month, year, motivation);
+                    listRequestPending.Add(f);
+                } 
+                else if(holiday.type == StatoFerie.Accettate)
+                {
+                    int day = holiday.day;
+                    int month = holiday.month;
+                    int year = holiday.year;
+                    string motivation = holiday.message;
+                    Ferie f = new Ferie(day, month, year, motivation);
+                    f.ApprovaFerie();
+                    listHolidaysAccepted.Add(f);
+                }
+                else if (holiday.type == StatoFerie.Rifiutate)
+                {
+                    int day = holiday.day;
+                    int month = holiday.month;
+                    int year = holiday.year;
+                    string motivation = holiday.message;
+                    Ferie f = new Ferie(day, month, year, motivation);
+                    f.RifiutaFerie();
+                    listHolidaysRefused.Add(f);
+                }
+            }
+
+        }
+        else
+        {
+            MessageBox.Show("Errore generico nella richiesta", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
         if( HolidaysReceived != null)
         {
             HolidaysReceived(this, getHolidaysDays());

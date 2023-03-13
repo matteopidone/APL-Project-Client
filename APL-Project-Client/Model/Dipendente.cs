@@ -77,24 +77,33 @@ public class Dipendente
                 int year = holiday.year;
                 string motivation = holiday.message;
                 Ferie f = new Ferie(day, month, year, motivation);
-
-                switch ((StatoFerie)holiday.type)
+                
+                try
                 {
-                    case StatoFerie.Richieste :
-                        listRequestPending.Add(f);
-                        break;
+                    switch ((StatoFerie)holiday.type)
+                    {
+                        case StatoFerie.Richieste :
+                            listRequestPending.Add(f);
+                            break;
 
-                    case StatoFerie.Accettate :
-                        f.HolidayApproved();
-                        listHolidaysAccepted.Add(f);
-                        break;
+                        case StatoFerie.Accettate :
+                            f.HolidayApproved();
+                            listHolidaysAccepted.Add(f);
+                            break;
 
-                    case StatoFerie.Rifiutate :
-                        f.HolidayRefused();
-                        listHolidaysRefused.Add(f);
-                        break;
+                        case StatoFerie.Rifiutate :
+                            f.HolidayRefused();
+                            listHolidaysRefused.Add(f);
+                            break;
 
+                    }
+
+                } catch (InvalidOperationException exception )
+                {
+                    MessageBox.Show("Errore :" + exception.Message +"\nContattare il tuo datore di lavoro", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
                 }
+
             }
         }
         else

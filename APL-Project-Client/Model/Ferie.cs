@@ -15,7 +15,7 @@ public interface IFerieState
 {
     void HolidayApproved(Ferie ferie);
     void HolidayRefused(Ferie ferie);
-    StatoFerie GetStato();
+    StatoFerie getState();
 }
 
 public class FerieRichieste : IFerieState
@@ -29,7 +29,7 @@ public class FerieRichieste : IFerieState
     {
         ferie.Stato = new FerieRifiutate();
     }
-    public StatoFerie GetStato()
+    public StatoFerie getState()
     {
         return StatoFerie.Richieste;
     }
@@ -46,7 +46,7 @@ public class FerieAccettate : IFerieState
     {
         ferie.Stato = new FerieRifiutate();
     }
-    public StatoFerie GetStato()
+    public StatoFerie getState()
     {
         return StatoFerie.Accettate;
     }
@@ -63,7 +63,7 @@ public class FerieRifiutate : IFerieState
     {
         throw new InvalidOperationException("Le ferie sono già state rifiutate");
     }
-    public StatoFerie GetStato()
+    public StatoFerie getState()
     {
         return StatoFerie.Rifiutate;
     }
@@ -81,15 +81,15 @@ public class Ferie
     {
         get
         {
-            if (stato.GetStato() is StatoFerie.Richieste)
+            if (stato.getState() is StatoFerie.Richieste)
             {
                 return ("RICHIESTA");
             }
-            else if (stato.GetStato() is StatoFerie.Accettate)
+            else if (stato.getState() is StatoFerie.Accettate)
             {
                 return ("ACCETTATA");
             }
-            else if (stato.GetStato() is StatoFerie.Rifiutate)
+            else if (stato.getState() is StatoFerie.Rifiutate)
             {
                 return ("RIFIUTATA");
             }

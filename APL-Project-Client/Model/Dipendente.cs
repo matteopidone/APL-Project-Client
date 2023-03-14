@@ -74,66 +74,37 @@ public class Dipendente
         HttpClient client = new HttpClient();
         UriBuilder uriBuilder = new UriBuilder("http://localhost:9000/api/getHolidays");
         uriBuilder.Query = "email=" + email;
-        try
-        {
-            response = await client.GetAsync(uriBuilder.ToString());
-        }
-        catch (HttpRequestException ex)
-        {
-            MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return false;
-        }
+        response = await client.GetAsync(uriBuilder.ToString());
+        
         if (response.IsSuccessStatusCode)
         {
             string content = await response.Content.ReadAsStringAsync(); 
-            dynamic json = JsonConvert.DeserializeObject(content);
+            List<getHolidaysAPIResult> listHolidaysReceived = JsonConvert.DeserializeObject<List<getHolidaysAPIResult>>(content);
 
-            foreach(var holiday in json)
+            foreach(getHolidaysAPIResult holiday in listHolidaysReceived)
             {
-                int day = holiday.day;
-                int month = holiday.month;
-                int year = holiday.year;
-                string motivation = holiday.message;
-                Ferie f = new Ferie(day, month, year, motivation);
+                Ferie f = new Ferie(holiday.day, holiday.month, holiday.year, holiday.message);
                 
-                try
+                switch (holiday.type)
                 {
-                    switch ((StatoFerie)holiday.type)
-                    {
-                        case StatoFerie.Richieste :
-                            listRequestPending.Add(f);
-                            break;
+                    case StatoFerie.Richieste :
+                        listRequestPending.Add(f);
+                        break;
 
-                        case StatoFerie.Accettate :
-                            f.HolidayApproved();
-                            listHolidaysAccepted.Add(f);
-                            break;
+                    case StatoFerie.Accettate :
+                        f.HolidayApproved();
+                        listHolidaysAccepted.Add(f);
+                        break;
 
-                        case StatoFerie.Rifiutate :
-                            f.HolidayRefused();
-                            listHolidaysRefused.Add(f);
-                            break;
+                    case StatoFerie.Rifiutate :
+                        f.HolidayRefused();
+                        listHolidaysRefused.Add(f);
+                        break;
 
-                    }
-
-                } catch (InvalidOperationException exception )
-                {
-                    MessageBox.Show("Errore :" + exception.Message +"\nContattare il tuo datore di lavoro", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
                 }
 
             }
         }
-        else
-        {
-            MessageBox.Show("Errore generico nella richiesta", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
         if( HolidaysAcceptedReceived != null)
         {
             HolidaysAcceptedReceived(this, getDateHolidaysAccepted());

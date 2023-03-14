@@ -53,12 +53,35 @@ namespace APL_Project_Client
             dataGridView1.DataSource = e;
             dataGridView1.Visible = true;
         }
+        private async void fetchAllHolidays()
+        {
+            // Definisco associo gli handler agli eventi esposti per popolare la Home.
+            d.HolidaysAcceptedReceived += HolidaysReceiveHandler;
+            d.HolidaysPendingUpdated += RequestHolidaysUpdatedHandler;
+            try
+            {
+                await d.fetchHolidays();
+
+            }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (InvalidOperationException ex )
+            {
+                MessageBox.Show("Errore :" + ex.Message +"\nContattare il tuo datore di lavoro", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            }
+
+        }
+
         private async void Home_Load(object sender, EventArgs e)
         {
-            d.HolidaysAcceptedReceived += this.HolidaysReceiveHandler;
-            d.HolidaysPendingUpdated += this.RequestHolidaysUpdatedHandler;
-            var boolean = await d.fetchHolidays();
-
+            fetchAllHolidays();
         }
 
         private void monthCalendar1_DateChanged(object sender, DateRangeEventArgs e)
@@ -101,7 +124,7 @@ namespace APL_Project_Client
                 monthCalendar1.Update();
 
             }
-        }
+        }   
 
         private void label2_Click(object sender, EventArgs e)
         {

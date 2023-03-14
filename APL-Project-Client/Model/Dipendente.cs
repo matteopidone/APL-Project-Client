@@ -17,8 +17,8 @@ public class Dipendente
     // Lista di richiese di ferie rifiutate.
     private List<Ferie> listHolidaysRefused;
 
-    public event EventHandler<List<DateTime>> HolidaysReceived;
-    public event EventHandler<List<Ferie>> RequestHolidaysUpdated;
+    public event EventHandler<List<DateTime>> HolidaysAcceptedReceived;
+    public event EventHandler<List<Ferie>> HolidaysPendingUpdated;
     public Dipendente(string nome, string cognome, string email)
 	{
         this.nome = nome;
@@ -30,7 +30,7 @@ public class Dipendente
 
     }
 
-    private List<DateTime> getHolidaysDays()
+    private List<DateTime> getDateHolidaysAccepted()
     {
         List<DateTime> d = new List<DateTime>();
         if(listHolidaysAccepted != null) 
@@ -77,24 +77,33 @@ public class Dipendente
                 int year = holiday.year;
                 string motivation = holiday.message;
                 Ferie f = new Ferie(day, month, year, motivation);
-
-                switch ((StatoFerie)holiday.type)
+                
+                try
                 {
-                    case StatoFerie.Richieste :
-                        listRequestPending.Add(f);
-                        break;
+                    switch ((StatoFerie)holiday.type)
+                    {
+                        case StatoFerie.Richieste :
+                            listRequestPending.Add(f);
+                            break;
 
-                    case StatoFerie.Accettate :
-                        f.ApprovaFerie();
-                        listHolidaysAccepted.Add(f);
-                        break;
+                        case StatoFerie.Accettate :
+                            f.HolidayApproved();
+                            listHolidaysAccepted.Add(f);
+                            break;
 
-                    case StatoFerie.Rifiutate :
-                        f.RifiutaFerie();
-                        listHolidaysRefused.Add(f);
-                        break;
+                        case StatoFerie.Rifiutate :
+                            f.HolidayRefused();
+                            listHolidaysRefused.Add(f);
+                            break;
 
+                    }
+
+                } catch (InvalidOperationException exception )
+                {
+                    MessageBox.Show("Errore :" + exception.Message +"\nContattare il tuo datore di lavoro", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
                 }
+
             }
         }
         else
@@ -102,13 +111,13 @@ public class Dipendente
             MessageBox.Show("Errore generico nella richiesta", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        if( HolidaysReceived != null)
+        if( HolidaysAcceptedReceived != null)
         {
-            HolidaysReceived(this, getHolidaysDays());
+            HolidaysAcceptedReceived(this, getDateHolidaysAccepted());
         }
-        if (RequestHolidaysUpdated != null)
+        if (HolidaysPendingUpdated != null)
         {
-            RequestHolidaysUpdated(this, getHolidaysRequestedAndRefused());
+            HolidaysPendingUpdated(this, getHolidaysPendingAndRefused());
         }
         return true;
     }
@@ -126,12 +135,12 @@ public class Dipendente
         
         } catch (HttpRequestException ex)
         {
-            MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Errore nella richiesta: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return false;
         }
         catch (Exception ex)
         {
-            MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Errore generico: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return false;
         }
 
@@ -143,22 +152,22 @@ public class Dipendente
             {
                 Ferie f = new Ferie(date.Day, date.Month, date.Year, "Motivation");
                 listRequestPending.Add(f);
-                if (RequestHolidaysUpdated != null)
+                if (HolidaysPendingUpdated != null)
                 {
-                    RequestHolidaysUpdated(this, getHolidaysRequestedAndRefused());
+                    HolidaysPendingUpdated(this, getHolidaysPendingAndRefused());
                 }
                 return true;
             }
         }
         else
         {
-            MessageBox.Show("Errore nella richiesta", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Errore nella richiesta", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return false;
         }
         return false;
     }
 
-    public bool isGiornoFerie(DateTime date)
+    public bool isHolidayAccepted(DateTime date)
     {
         if( listHolidaysAccepted.Count != 0)
         {
@@ -166,8 +175,7 @@ public class Dipendente
         }
         return false;
     }
-    //Simile a quello sopra
-    public bool RequestContainsDate(DateTime date)
+    public bool isHolidayPending(DateTime date)
     {
         if (listRequestPending.Count != 0)
         {
@@ -181,7 +189,7 @@ public class Dipendente
         return new List<Dipendente>();
     }
 
-    private List<Ferie> getHolidaysRequestedAndRefused()
+    private List<Ferie> getHolidaysPendingAndRefused()
     {
         return listRequestPending.OrderBy(f => f.date).Concat(listHolidaysRefused.OrderBy(f => f.date)).ToList();
     }

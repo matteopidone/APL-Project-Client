@@ -55,8 +55,8 @@ namespace APL_Project_Client
         }
         private async void Home_Load(object sender, EventArgs e)
         {
-            d.HolidaysReceived += this.HolidaysReceiveHandler;
-            d.RequestHolidaysUpdated += this.RequestHolidaysUpdatedHandler;
+            d.HolidaysAcceptedReceived += this.HolidaysReceiveHandler;
+            d.HolidaysPendingUpdated += this.RequestHolidaysUpdatedHandler;
             var boolean = await d.fetchHolidays();
 
         }
@@ -66,12 +66,12 @@ namespace APL_Project_Client
             DateTime date = e.Start;
             if(semaphoreSendRequest.CurrentCount == 1)
             {
-                if( d.RequestContainsDate(date) )
+                if( d.isHolidayPending(date) )
                 {
                     this.label3.Text = "Hai già effettuato la richiesta per giorno " + date.ToString("d");
                     this.label3.Visible = true;
                 }
-                else if( ! d.isGiornoFerie(date) && ! IsWeekend(date) && date > DateTime.Now )
+                else if( ! d.isHolidayAccepted(date) && ! IsWeekend(date) && date > DateTime.Now )
                 {
                     dateSelected = date;
                     this.label3.Text = "Vuoi procedere alla richiesta per giorno " + dateSelected.ToString("d") + "?";

@@ -12,5 +12,13 @@ namespace APL_Project_Client.Model
         public string name { get; set; }
         public string surname { get; set; }
         public string email { get; set; }
-}
+    }
+    public struct getHolidaysAPIResult
+    {
+        public StatoFerie type { get; set; }
+        public int day { get; set; }
+        public int month { get; set; }
+        public int year { get; set; }
+        public string message { get; set; }
+    }
 }

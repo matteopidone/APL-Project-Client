@@ -43,7 +43,30 @@ public class Dipendente
         }
         return d;
     
-    } 
+    }
+    public static async Task<LoginAPIResult> loginUser(string email, string password)
+    {
+        LoginAPIResult r;
+        
+
+        HttpClient client = new HttpClient();
+        Dictionary<string, string> parameters = new Dictionary<string, string> { { "email", email }, { "password", password } };
+        string jsonRequest = JsonConvert.SerializeObject(parameters);
+        HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
+        var response = await client.PostAsync("http://localhost:9000/api/login", content);
+        if (response.IsSuccessStatusCode)
+        {
+            string result = await response.Content.ReadAsStringAsync();
+            r = JsonConvert.DeserializeObject<LoginAPIResult>(result);
+        } else
+        {
+            r = new LoginAPIResult();
+            r.found = false;
+        }
+
+        return r;
+
+    }
 
     public async Task<bool> fetchHolidays()
     {

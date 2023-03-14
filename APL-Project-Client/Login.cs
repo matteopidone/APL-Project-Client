@@ -37,52 +37,42 @@ namespace APL_Project_Client
                 progressBar1.Style = ProgressBarStyle.Marquee;
                 progressBar1.MarqueeAnimationSpeed = 30;
                 progressBar1.Visible = true;
+                LoginAPIResult result;
                 
                 try 
                 {
-                    var client = new HttpClient();
-                    var parameters = new Dictionary<string, string> { { "email", nomeUtente }, { "password", hashedPassword } };
-                    string jsonRequest = JsonConvert.SerializeObject(parameters);
-                    HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
-                    var response = await client.PostAsync("http://localhost:9000/api/login", content);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string result = await response.Content.ReadAsStringAsync();
-                        dynamic json = JsonConvert.DeserializeObject(result);
-                        if ((bool)json.found)
-                        {
-                            string name = json.name;
-                            string surname = json.surname;
-                            string email = json.email;
-                            Home homeForm = new Home( new Dipendente(name, surname, email) );
-                            homeForm.Show();
-                            this.Hide();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Username o Password errati, riprova o contatta il tuo datore di lavoro", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            progressBar1.Value = 0;
-                            progressBar1.Visible = false;
-                        }
-
-                    } else
-                    {
-                        MessageBox.Show("Sistema non disponibile, riprovare più tardi.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        progressBar1.Value = 0;
-                        progressBar1.Visible = false;
-                    }
-
-                } catch (HttpRequestException ex)
+                    result = await Dipendente.loginUser(nomeUtente, password);
+                }
+                catch (HttpRequestException ex)
                 {
                     MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     progressBar1.Value = 0;
                     progressBar1.Visible = false;
+                    return;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     progressBar1.Value = 0;
                     progressBar1.Visible = false;
+                    return;
+                } 
+                
+                if (result.found)
+                {
+                    string name = result.name;
+                    string surname = result.surname;
+                    string email = result.email;
+                    Home homeForm = new Home( new Dipendente(name, surname, email) );
+                    homeForm.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show("Username o Password errati, riprova o contatta il tuo datore di lavoro", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    progressBar1.Value = 0;
+                    progressBar1.Visible = false;
+                    return;
                 }
 
             } else
@@ -90,6 +80,7 @@ namespace APL_Project_Client
                 MessageBox.Show("Inserisci tutti i dati o inserisci una mail valida", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 progressBar1.Value = 0;
                 progressBar1.Visible = false;
+                return;
 
             }
         }

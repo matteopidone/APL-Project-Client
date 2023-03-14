@@ -44,9 +44,9 @@ namespace APL_Project_Client
         
         private void HolidaysReceiveHandler(object sender, List<DateTime> e)
         {
-            this.ColorizeDates(e, Color.Red);
-            this.progressBar1.Visible = false;
-            this.monthCalendar1.Visible = true;
+            addHolidaysToCalendar(e);
+            progressBar1.Visible = false;
+            monthCalendar1.Visible = true;
         }
         private void RequestHolidaysUpdatedHandler(object sender, List<Ferie> e)
         {
@@ -92,19 +92,13 @@ namespace APL_Project_Client
         {
             return date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
         }
-        private void ColorizeDates(List<DateTime> dates, Color color)
+        private void addHolidaysToCalendar(List<DateTime> dates)
         {
             foreach (DateTime date in dates)
             {
-            monthCalendar1.AddBoldedDate(date);
-            monthCalendar1.UpdateBoldedDates();
-
-            monthCalendar1.TitleForeColor = color;
-
-            monthCalendar1.RemoveAnnuallyBoldedDate(date);
-            monthCalendar1.AddAnnuallyBoldedDate(date);
-            monthCalendar1.UpdateBoldedDates();
-            monthCalendar1.Update();
+                monthCalendar1.AddBoldedDate(date);
+                monthCalendar1.UpdateBoldedDates();
+                monthCalendar1.Update();
 
             }
         }

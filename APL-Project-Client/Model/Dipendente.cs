@@ -116,35 +116,21 @@ public class Dipendente
         return true;
     }
 
-    public async Task<bool> sendHolidayRequest(DateTime date)
+    public async Task<bool> sendHolidayRequest(DateTime date, string motivation)
     {
         HttpResponseMessage response;
         HttpClient client = new HttpClient();
-        Dictionary<string, object> parameters = new Dictionary<string, object> { { "email", email }, { "year", date.Year }, { "month", date.Month }, { "day", date.Day }, { "message", "motivation" } };
+        Dictionary<string, object> parameters = new Dictionary<string, object> { { "email", email }, { "year", date.Year }, { "month", date.Month }, { "day", date.Day }, { "message", motivation } };
         string jsonRequest = JsonConvert.SerializeObject(parameters);
         HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
-        try
-        {
-            response = await client.PostAsync("http://localhost:9000/api/insertHoliday", content);
-        
-        } catch (HttpRequestException ex)
-        {
-            MessageBox.Show("Errore nella richiesta: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("Errore generico: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return false;
-        }
-
+        response = await client.PostAsync("http://localhost:9000/api/insertHoliday", content);
         if (response.IsSuccessStatusCode)
         {
             string Resultcontent = await response.Content.ReadAsStringAsync();
-            dynamic json = JsonConvert.DeserializeObject(Resultcontent);
-            if ((bool)json.result)
+            insertHolidayAPIResult json = JsonConvert.DeserializeObject<insertHolidayAPIResult>(Resultcontent);
+            if (json.result)
             {
-                Ferie f = new Ferie(date.Day, date.Month, date.Year, "Motivation");
+                Ferie f = new Ferie(date.Day, date.Month, date.Year, motivation);
                 listRequestPending.Add(f);
                 if (HolidaysPendingUpdated != null)
                 {
@@ -152,11 +138,6 @@ public class Dipendente
                 }
                 return true;
             }
-        }
-        else
-        {
-            MessageBox.Show("Errore nella richiesta", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return false;
         }
         return false;
     }

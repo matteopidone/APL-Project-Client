@@ -91,20 +91,23 @@ namespace APL_Project_Client
             {
                 if( d.isHolidayPending(date) )
                 {
-                    this.label3.Text = "Hai già effettuato la richiesta per giorno " + date.ToString("d");
-                    this.label3.Visible = true;
+                    label3.Text = "Hai già effettuato la richiesta per giorno " + date.ToString("d");
+                    label3.Visible = true;
                 }
                 else if( ! d.isHolidayAccepted(date) && ! IsWeekend(date) && date > DateTime.Now )
                 {
                     dateSelected = date;
-                    this.label3.Text = "Vuoi procedere alla richiesta per giorno " + dateSelected.ToString("d") + "?";
-                    this.button2.Visible = true;
-                    this.label3.Visible = true;
+                    label3.Text = "Vuoi procedere alla richiesta per giorno " + dateSelected.ToString("d") + "?";
+                    button2.Visible = true;
+                    label3.Visible = true;
+                    textBox1.Visible = true;
 
                 } else {
-                    this.label3.Text = "";
-                    this.button2.Visible = false;
-                    this.label3.Visible = false;
+                    label3.Text = "";
+                    button2.Visible = false;
+                    textBox1.Text = "";
+                    textBox1.Visible = false;
+                    label3.Visible = false;
                 }
 
             }
@@ -135,44 +138,56 @@ namespace APL_Project_Client
         {
 
         }
+        private async void sendHolidayRequest(string motivation)
+        {
+            try
+            {
+                label3.Visible = false;
+                button2.Visible = false;
+                textBox1.Visible= false;
+                textBox1.Text = "";
+                progressBar2.Visible = true;
+                await semaphoreSendRequest.WaitAsync();
+                bool response = false;
+                try
+                {
+                    response = await d.sendHolidayRequest(dateSelected, motivation);
+                }
+                catch (HttpRequestException ex)
+                {
+                    MessageBox.Show("Errore nella richiesta: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Errore generico: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                //Inserire una progress bar
+                if (response)
+                {
+                    label3.Text = "Richiesta di ferie inoltrata con successo!";
+                    progressBar2.Visible = false;
+                    label3.Visible = true;
+                }
+                else
+                {
+                    label3.Text = "Impossibile inoltrare la richiesta.";
+                    progressBar2.Visible = false;
+                    label3.Visible = true;
+
+                }
+            }
+            finally
+            {
+                semaphoreSendRequest.Release();
+            }
+        }
 
         private async void button2_Click(object sender, EventArgs e)
         {
-            if(this.dateSelected != null)
+            if(dateSelected != null)
             {
-                try
-                {
-                    //Inlobare queste cose in un metodo, o inglobare i due compoenenti in un compoenente, non lo sos
-                    this.label3.Visible = false;
-                    this.button2.Visible = false;
-                    this.progressBar2.Visible = true;
-                    await semaphoreSendRequest.WaitAsync();
-                    bool response = await d.sendHolidayRequest(this.dateSelected);
-                    //Inserire una progress bar
-                    //Richiesta http per richiedere il giorno di ferie
-                    if (response)
-                    {
-                        this.label3.Text = "Richiesta di ferie inoltrata con successo!";
-                        this.progressBar2.Visible = false;
-                        this.label3.Visible = true;
-                        //Posso invocare un evento che vada ad aggiornare il listato di ferie preso (ordinato per data) e magari riutilizzare logiche e meccanismi di load di questo "componente"
-                        //Se faccio un componente custom, posso omagari passare al load una lista di ferie, e quando la richiamo magari passo la vecchia lista in add col valore nuovo
-                        //Disaccoppiando il render del componente alle logiche di poolamento che ci stanno dietro
-                        //UpdateListFerie(response)
-                    }
-                    else
-                    {
-                        this.label3.Text = "Impossibile inoltrare la richiesta.";
-                        this.progressBar2.Visible = false;
-                        this.label3.Visible = true;
-                        //RequestError()
-
-                    }
-                }
-                finally
-                {
-                    semaphoreSendRequest.Release();
-                }
+                string motivation = textBox1.Text;
+                sendHolidayRequest(motivation);
 
             }
             else

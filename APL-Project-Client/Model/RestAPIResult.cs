@@ -21,4 +21,9 @@ namespace APL_Project_Client.Model
         public int year { get; set; }
         public string message { get; set; }
     }
+    public struct insertHolidayAPIResult
+    {
+        public bool result { get; set; }
+        
+    }
 }

@@ -123,7 +123,7 @@ namespace APL_Project_Client
 
         }
 
-        private async void Home_Load(object sender, EventArgs e)
+        private void Home_Load(object sender, EventArgs e)
         {
             fetchAllHolidays();
         }
@@ -212,7 +212,7 @@ namespace APL_Project_Client
             }
         }
 
-        private async void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
             if(dateSelected != null)
             {

@@ -20,7 +20,7 @@ namespace APL_Project_Client
 
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
             string email = this.textBox1.Text;
             string password = this.textBox2.Text;

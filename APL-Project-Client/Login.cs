@@ -22,67 +22,73 @@ namespace APL_Project_Client
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            string nomeUtente = this.textBox1.Text;
+            string email = this.textBox1.Text;
             string password = this.textBox2.Text;
+            sendLoginRequest(email, password);
+        }
+        private async void sendLoginRequest(string email, string password)
+        {
             //byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             //byte[] hashedBytes = new SHA256Managed().ComputeHash(passwordBytes);
             //string hashedPassword = Convert.ToBase64String(hashedBytes);
             string hashedPassword = password;
 
-            bool isValidEmail = Regex.IsMatch(nomeUtente, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+            bool isValidEmail = Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
 
-            if (nomeUtente.Length != 0 && password.Length != 0 && isValidEmail)
+            if (email.Length != 0 && password.Length != 0 && isValidEmail)
             {
-
-                progressBar1.Style = ProgressBarStyle.Marquee;
-                progressBar1.MarqueeAnimationSpeed = 30;
-                progressBar1.Visible = true;
+                showProgressBarLogin();
                 LoginAPIResult result;
-                
-                try 
+
+                try
                 {
-                    result = await Dipendente.loginUser(nomeUtente, password);
+                    result = await Dipendente.loginUser(email, password);
                 }
                 catch (HttpRequestException ex)
                 {
                     MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    progressBar1.Value = 0;
-                    progressBar1.Visible = false;
+                    hideProgressBarLogin();
                     return;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    progressBar1.Value = 0;
-                    progressBar1.Visible = false;
+                    hideProgressBarLogin();
                     return;
-                } 
-                
+                }
+
                 if (result.found)
                 {
-                    string name = result.name;
-                    string surname = result.surname;
-                    string email = result.email;
-                    Home homeForm = new Home( new Dipendente(name, surname, email) );
+                    Home homeForm = new Home(new Dipendente(result.name, result.surname, result.email));
                     homeForm.Show();
-                    this.Hide();
+                    Hide();
                 }
                 else
                 {
                     MessageBox.Show("Username o Password errati, riprova o contatta il tuo datore di lavoro", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    progressBar1.Value = 0;
-                    progressBar1.Visible = false;
+                    hideProgressBarLogin();
                     return;
                 }
 
-            } else
+            }
+            else
             {
                 MessageBox.Show("Inserisci tutti i dati o inserisci una mail valida", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                progressBar1.Value = 0;
-                progressBar1.Visible = false;
+                hideProgressBarLogin();
                 return;
 
             }
+        }
+        private void showProgressBarLogin()
+        {
+            progressBar1.Style = ProgressBarStyle.Marquee;
+            progressBar1.MarqueeAnimationSpeed = 30;
+            progressBar1.Visible = true;
+        }
+        private void hideProgressBarLogin()
+        {
+            progressBar1.Value = 0;
+            progressBar1.Visible = false;
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)

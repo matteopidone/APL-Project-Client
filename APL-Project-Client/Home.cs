@@ -41,17 +41,61 @@ namespace APL_Project_Client
                 this.Hide();
             }
         }
-        
-        private void HolidaysReceiveHandler(object sender, List<DateTime> e)
+        private void showCalendar()
         {
-            addHolidaysToCalendar(e);
             progressBar1.Visible = false;
             monthCalendar1.Visible = true;
         }
+        private void showTableHolidays(List<Ferie> f)
+        {
+            dataGridView1.DataSource = f;
+            dataGridView1.Visible = true;
+        }
+        private void showFormSendHolidayRequest(string date)
+        {
+            label3.Text = "Vuoi procedere alla richiesta per giorno " + date + "?";
+            button2.Visible = true;
+            label3.Visible = true;
+            textBox1.Visible = true;
+        }
+
+        private void hideFormSendHolidayRequest()
+        {
+            label3.Text = "";
+            button2.Visible = false;
+            textBox1.Text = "";
+            textBox1.Visible = false;
+            label3.Visible = false;
+        }
+        private void showHolidaysProgressBar()
+        {
+            progressBar2.Visible = true;
+        }
+        private void HolidaysReceiveHandler(object sender, List<DateTime> e)
+        {
+            addHolidaysToCalendar(e);
+            showCalendar();
+        }
         private void RequestHolidaysUpdatedHandler(object sender, List<Ferie> e)
         {
-            dataGridView1.DataSource = e;
-            dataGridView1.Visible = true;
+            showTableHolidays(e);
+        }
+        private void showAlreadyRequestedMessage(string day)
+        {
+            label3.Text = "Hai già effettuato la richiesta per giorno " + day;
+            label3.Visible = true;
+        }
+        private void showMessageRequestSendSuccess()
+        {
+            label3.Text = "Richiesta di ferie inoltrata con successo!";
+            progressBar2.Visible = false;
+            label3.Visible = true;
+        }
+        private void showMessageRequestSendFailed()
+        {
+            label3.Text = "Impossibile inoltrare la richiesta.";
+            progressBar2.Visible = false;
+            label3.Visible = true;
         }
         private async void fetchAllHolidays()
         {
@@ -91,23 +135,16 @@ namespace APL_Project_Client
             {
                 if( d.isHolidayPending(date) )
                 {
-                    label3.Text = "Hai già effettuato la richiesta per giorno " + date.ToString("d");
-                    label3.Visible = true;
+                    showAlreadyRequestedMessage(date.ToString("d"));
+
                 }
                 else if( ! d.isHolidayAccepted(date) && ! IsWeekend(date) && date > DateTime.Now )
                 {
                     dateSelected = date;
-                    label3.Text = "Vuoi procedere alla richiesta per giorno " + dateSelected.ToString("d") + "?";
-                    button2.Visible = true;
-                    label3.Visible = true;
-                    textBox1.Visible = true;
+                    showFormSendHolidayRequest(dateSelected.ToString("d"));
 
                 } else {
-                    label3.Text = "";
-                    button2.Visible = false;
-                    textBox1.Text = "";
-                    textBox1.Visible = false;
-                    label3.Visible = false;
+                    hideFormSendHolidayRequest();
                 }
 
             }
@@ -142,11 +179,9 @@ namespace APL_Project_Client
         {
             try
             {
-                label3.Visible = false;
-                button2.Visible = false;
-                textBox1.Visible= false;
-                textBox1.Text = "";
-                progressBar2.Visible = true;
+                hideFormSendHolidayRequest();
+                showHolidaysProgressBar();
+
                 await semaphoreSendRequest.WaitAsync();
                 bool response = false;
                 try
@@ -164,16 +199,11 @@ namespace APL_Project_Client
                 //Inserire una progress bar
                 if (response)
                 {
-                    label3.Text = "Richiesta di ferie inoltrata con successo!";
-                    progressBar2.Visible = false;
-                    label3.Visible = true;
+                    showMessageRequestSendSuccess();
                 }
                 else
                 {
-                    label3.Text = "Impossibile inoltrare la richiesta.";
-                    progressBar2.Visible = false;
-                    label3.Visible = true;
-
+                    showMessageRequestSendFailed();
                 }
             }
             finally
@@ -192,9 +222,7 @@ namespace APL_Project_Client
             }
             else
             {
-                label3.Text = "Impossibile inoltrare la richiesta.";
-                progressBar2.Visible = false;
-                label3.Visible = true;
+                showMessageRequestSendFailed();
             }
         }
 

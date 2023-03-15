@@ -192,11 +192,9 @@ namespace APL_Project_Client
             }
             else
             {
-                this.label3.Text = "Impossibile inoltrare la richiesta.";
-                this.progressBar2.Visible = false;
-                this.label3.Visible = true;
-                //Invocare un metodo che è invocato sia nel caso di fallimento della chiamata http, sia se ce'è un'inconsistenza
-                //RequestError()
+                label3.Text = "Impossibile inoltrare la richiesta.";
+                progressBar2.Visible = false;
+                label3.Visible = true;
             }
         }
 

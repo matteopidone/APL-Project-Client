@@ -39,6 +39,7 @@
             this.progressBar2 = new System.Windows.Forms.ProgressBar();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.ferieBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.textBox1 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ferieBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -99,7 +100,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(742, 147);
+            this.button2.Location = new System.Drawing.Point(745, 203);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(94, 29);
             this.button2.TabIndex = 5;
@@ -119,7 +120,7 @@
             // 
             // progressBar2
             // 
-            this.progressBar2.Location = new System.Drawing.Point(732, 147);
+            this.progressBar2.Location = new System.Drawing.Point(729, 203);
             this.progressBar2.MarqueeAnimationSpeed = 30;
             this.progressBar2.Name = "progressBar2";
             this.progressBar2.Size = new System.Drawing.Size(125, 29);
@@ -146,11 +147,20 @@
             this.ferieBindingSource.DataSource = typeof(APL_Project_Client.Model.Ferie);
             this.ferieBindingSource.CurrentChanged += new System.EventHandler(this.ferieBindingSource_CurrentChanged);
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(627, 150);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(326, 27);
+            this.textBox1.TabIndex = 9;
+            this.textBox1.Visible = false;
+            // 
             // Home
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1483, 735);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.progressBar2);
             this.Controls.Add(this.progressBar1);
@@ -184,5 +194,6 @@
         private ProgressBar progressBar2;
         private DataGridView dataGridView1;
         private BindingSource ferieBindingSource;
+        private TextBox textBox1;
     }
 }

@@ -41,24 +41,91 @@ namespace APL_Project_Client
                 this.Hide();
             }
         }
-        
+        private void showCalendar()
+        {
+            progressBar1.Visible = false;
+            monthCalendar1.Visible = true;
+        }
+        private void showTableHolidays(List<Ferie> f)
+        {
+            dataGridView1.DataSource = f;
+            dataGridView1.Visible = true;
+        }
+        private void showFormSendHolidayRequest(string date)
+        {
+            label3.Text = "Vuoi procedere alla richiesta per giorno " + date + "?";
+            button2.Visible = true;
+            label3.Visible = true;
+            textBox1.Visible = true;
+        }
+
+        private void hideFormSendHolidayRequest()
+        {
+            label3.Text = "";
+            button2.Visible = false;
+            textBox1.Text = "";
+            textBox1.Visible = false;
+            label3.Visible = false;
+        }
+        private void showHolidaysProgressBar()
+        {
+            progressBar2.Visible = true;
+        }
         private void HolidaysReceiveHandler(object sender, List<DateTime> e)
         {
-            this.ColorizeDates(e, Color.Red);
-            this.progressBar1.Visible = false;
-            this.monthCalendar1.Visible = true;
+            addHolidaysToCalendar(e);
+            showCalendar();
         }
         private void RequestHolidaysUpdatedHandler(object sender, List<Ferie> e)
         {
-            dataGridView1.DataSource = e;
-            dataGridView1.Visible = true;
+            showTableHolidays(e);
         }
-        private async void Home_Load(object sender, EventArgs e)
+        private void showAlreadyRequestedMessage(string day)
         {
-            d.HolidaysAcceptedReceived += this.HolidaysReceiveHandler;
-            d.HolidaysPendingUpdated += this.RequestHolidaysUpdatedHandler;
-            var boolean = await d.fetchHolidays();
+            label3.Text = "Hai già effettuato la richiesta per giorno " + day;
+            label3.Visible = true;
+        }
+        private void showMessageRequestSendSuccess()
+        {
+            label3.Text = "Richiesta di ferie inoltrata con successo!";
+            progressBar2.Visible = false;
+            label3.Visible = true;
+        }
+        private void showMessageRequestSendFailed()
+        {
+            label3.Text = "Impossibile inoltrare la richiesta.";
+            progressBar2.Visible = false;
+            label3.Visible = true;
+        }
+        private async void fetchAllHolidays()
+        {
+            // Definisco associo gli handler agli eventi esposti per popolare la Home.
+            d.HolidaysAcceptedReceived += HolidaysReceiveHandler;
+            d.HolidaysPendingUpdated += RequestHolidaysUpdatedHandler;
+            try
+            {
+                await d.fetchHolidays();
 
+            }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (InvalidOperationException ex )
+            {
+                MessageBox.Show("Errore :" + ex.Message +"\nContattare il tuo datore di lavoro", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            }
+
+        }
+
+        private void Home_Load(object sender, EventArgs e)
+        {
+            fetchAllHolidays();
         }
 
         private void monthCalendar1_DateChanged(object sender, DateRangeEventArgs e)
@@ -68,20 +135,16 @@ namespace APL_Project_Client
             {
                 if( d.isHolidayPending(date) )
                 {
-                    this.label3.Text = "Hai già effettuato la richiesta per giorno " + date.ToString("d");
-                    this.label3.Visible = true;
+                    showAlreadyRequestedMessage(date.ToString("d"));
+
                 }
                 else if( ! d.isHolidayAccepted(date) && ! IsWeekend(date) && date > DateTime.Now )
                 {
                     dateSelected = date;
-                    this.label3.Text = "Vuoi procedere alla richiesta per giorno " + dateSelected.ToString("d") + "?";
-                    this.button2.Visible = true;
-                    this.label3.Visible = true;
+                    showFormSendHolidayRequest(dateSelected.ToString("d"));
 
                 } else {
-                    this.label3.Text = "";
-                    this.button2.Visible = false;
-                    this.label3.Visible = false;
+                    hideFormSendHolidayRequest();
                 }
 
             }
@@ -92,22 +155,16 @@ namespace APL_Project_Client
         {
             return date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
         }
-        private void ColorizeDates(List<DateTime> dates, Color color)
+        private void addHolidaysToCalendar(List<DateTime> dates)
         {
             foreach (DateTime date in dates)
             {
-            monthCalendar1.AddBoldedDate(date);
-            monthCalendar1.UpdateBoldedDates();
-
-            monthCalendar1.TitleForeColor = color;
-
-            monthCalendar1.RemoveAnnuallyBoldedDate(date);
-            monthCalendar1.AddAnnuallyBoldedDate(date);
-            monthCalendar1.UpdateBoldedDates();
-            monthCalendar1.Update();
+                monthCalendar1.AddBoldedDate(date);
+                monthCalendar1.UpdateBoldedDates();
+                monthCalendar1.Update();
 
             }
-        }
+        }   
 
         private void label2_Click(object sender, EventArgs e)
         {
@@ -118,53 +175,54 @@ namespace APL_Project_Client
         {
 
         }
-
-        private async void button2_Click(object sender, EventArgs e)
+        private async void sendHolidayRequest(string motivation)
         {
-            if(this.dateSelected != null)
+            try
             {
+                hideFormSendHolidayRequest();
+                showHolidaysProgressBar();
+
+                await semaphoreSendRequest.WaitAsync();
+                bool response = false;
                 try
                 {
-                    //Inlobare queste cose in un metodo, o inglobare i due compoenenti in un compoenente, non lo sos
-                    this.label3.Visible = false;
-                    this.button2.Visible = false;
-                    this.progressBar2.Visible = true;
-                    await semaphoreSendRequest.WaitAsync();
-                    bool response = await d.sendHolidayRequest(this.dateSelected);
-                    //Inserire una progress bar
-                    //Richiesta http per richiedere il giorno di ferie
-                    if (response)
-                    {
-                        this.label3.Text = "Richiesta di ferie inoltrata con successo!";
-                        this.progressBar2.Visible = false;
-                        this.label3.Visible = true;
-                        //Posso invocare un evento che vada ad aggiornare il listato di ferie preso (ordinato per data) e magari riutilizzare logiche e meccanismi di load di questo "componente"
-                        //Se faccio un componente custom, posso omagari passare al load una lista di ferie, e quando la richiamo magari passo la vecchia lista in add col valore nuovo
-                        //Disaccoppiando il render del componente alle logiche di poolamento che ci stanno dietro
-                        //UpdateListFerie(response)
-                    }
-                    else
-                    {
-                        this.label3.Text = "Impossibile inoltrare la richiesta.";
-                        this.progressBar2.Visible = false;
-                        this.label3.Visible = true;
-                        //RequestError()
-
-                    }
+                    response = await d.sendHolidayRequest(dateSelected, motivation);
                 }
-                finally
+                catch (HttpRequestException ex)
                 {
-                    semaphoreSendRequest.Release();
+                    MessageBox.Show("Errore nella richiesta: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Errore generico: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                //Inserire una progress bar
+                if (response)
+                {
+                    showMessageRequestSendSuccess();
+                }
+                else
+                {
+                    showMessageRequestSendFailed();
+                }
+            }
+            finally
+            {
+                semaphoreSendRequest.Release();
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if(dateSelected != null)
+            {
+                string motivation = textBox1.Text;
+                sendHolidayRequest(motivation);
 
             }
             else
             {
-                this.label3.Text = "Impossibile inoltrare la richiesta.";
-                this.progressBar2.Visible = false;
-                this.label3.Visible = true;
-                //Invocare un metodo che è invocato sia nel caso di fallimento della chiamata http, sia se ce'è un'inconsistenza
-                //RequestError()
+                showMessageRequestSendFailed();
             }
         }
 

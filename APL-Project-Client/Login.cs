@@ -20,78 +20,75 @@ namespace APL_Project_Client
 
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-            string nomeUtente = this.textBox1.Text;
+            string email = this.textBox1.Text;
             string password = this.textBox2.Text;
+            sendLoginRequest(email, password);
+        }
+        private async void sendLoginRequest(string email, string password)
+        {
             //byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             //byte[] hashedBytes = new SHA256Managed().ComputeHash(passwordBytes);
             //string hashedPassword = Convert.ToBase64String(hashedBytes);
             string hashedPassword = password;
 
-            bool isValidEmail = Regex.IsMatch(nomeUtente, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+            bool isValidEmail = Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
 
-            if (nomeUtente.Length != 0 && password.Length != 0 && isValidEmail)
+            if (email.Length != 0 && password.Length != 0 && isValidEmail)
             {
+                showProgressBarLogin();
+                LoginAPIResult result;
 
-                progressBar1.Style = ProgressBarStyle.Marquee;
-                progressBar1.MarqueeAnimationSpeed = 30;
-                progressBar1.Visible = true;
-                
-                try 
+                try
                 {
-                    var client = new HttpClient();
-                    var parameters = new Dictionary<string, string> { { "email", nomeUtente }, { "password", hashedPassword } };
-                    string jsonRequest = JsonConvert.SerializeObject(parameters);
-                    HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
-                    var response = await client.PostAsync("http://localhost:9000/api/login", content);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string result = await response.Content.ReadAsStringAsync();
-                        dynamic json = JsonConvert.DeserializeObject(result);
-                        if ((bool)json.found)
-                        {
-                            string name = json.name;
-                            string surname = json.surname;
-                            string email = json.email;
-                            Home homeForm = new Home( new Dipendente(name, surname, email) );
-                            homeForm.Show();
-                            this.Hide();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Username o Password errati, riprova o contatta il tuo datore di lavoro", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            progressBar1.Value = 0;
-                            progressBar1.Visible = false;
-                        }
-
-                    } else
-                    {
-                        MessageBox.Show("Sistema non disponibile, riprovare più tardi.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        progressBar1.Value = 0;
-                        progressBar1.Visible = false;
-                    }
-
-                } catch (HttpRequestException ex)
+                    result = await Dipendente.loginUser(email, password);
+                }
+                catch (HttpRequestException ex)
                 {
                     MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    progressBar1.Value = 0;
-                    progressBar1.Visible = false;
+                    hideProgressBarLogin();
+                    return;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    progressBar1.Value = 0;
-                    progressBar1.Visible = false;
+                    hideProgressBarLogin();
+                    return;
                 }
 
-            } else
-            {
-                MessageBox.Show("Inserisci tutti i dati o inserisci una mail valida", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                progressBar1.Value = 0;
-                progressBar1.Visible = false;
+                if (result.found)
+                {
+                    Home homeForm = new Home(new Dipendente(result.name, result.surname, result.email));
+                    homeForm.Show();
+                    Hide();
+                }
+                else
+                {
+                    MessageBox.Show("Username o Password errati, riprova o contatta il tuo datore di lavoro", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    hideProgressBarLogin();
+                    return;
+                }
 
             }
+            else
+            {
+                MessageBox.Show("Inserisci tutti i dati o inserisci una mail valida", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                hideProgressBarLogin();
+                return;
+
+            }
+        }
+        private void showProgressBarLogin()
+        {
+            progressBar1.Style = ProgressBarStyle.Marquee;
+            progressBar1.MarqueeAnimationSpeed = 30;
+            progressBar1.Visible = true;
+        }
+        private void hideProgressBarLogin()
+        {
+            progressBar1.Value = 0;
+            progressBar1.Visible = false;
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)

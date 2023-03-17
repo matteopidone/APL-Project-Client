@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 
 namespace APL_Project_Client.Model;
 public class Dipendente
@@ -9,7 +10,7 @@ public class Dipendente
     public string nome;
     public string cognome;
     public string email;
-
+    public string token;
     // Lista di richieste di ferie accettate.
     private List<Ferie> listHolidaysAccepted;
     // Lista di richieste di ferie in attesa.
@@ -19,11 +20,12 @@ public class Dipendente
 
     public event EventHandler<List<DateTime>> HolidaysAcceptedReceived;
     public event EventHandler<List<Ferie>> HolidaysPendingUpdated;
-    public Dipendente(string nome, string cognome, string email)
+    public Dipendente(string nome, string cognome, string email, string token)
 	{
         this.nome = nome;
         this.cognome = cognome; 
         this.email = email;
+        this.token = token;
         listRequestPending = new List<Ferie>();
         listHolidaysAccepted= new List<Ferie>();
         listHolidaysRefused = new List<Ferie>();
@@ -72,6 +74,8 @@ public class Dipendente
     {
         HttpResponseMessage response;
         HttpClient client = new HttpClient();
+        // Inserisco il token per autenticare la richiesta.
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         UriBuilder uriBuilder = new UriBuilder("http://localhost:9000/api/getHolidays");
         uriBuilder.Query = "email=" + email;
         response = await client.GetAsync(uriBuilder.ToString());
@@ -120,6 +124,8 @@ public class Dipendente
     {
         HttpResponseMessage response;
         HttpClient client = new HttpClient();
+        // Inserisco il token per autenticare la richiesta.
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         Dictionary<string, object> parameters = new Dictionary<string, object> { { "email", email }, { "year", date.Year }, { "month", date.Month }, { "day", date.Day }, { "message", motivation } };
         string jsonRequest = JsonConvert.SerializeObject(parameters);
         HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");

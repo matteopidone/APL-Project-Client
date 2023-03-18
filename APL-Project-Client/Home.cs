@@ -110,14 +110,20 @@ namespace APL_Project_Client
             catch (HttpRequestException ex)
             {
                 MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                showCalendar();
+                showTableHolidays(new List<Ferie>());
             }
             catch (InvalidOperationException ex )
             {
                 MessageBox.Show("Errore :" + ex.Message +"\nContattare il tuo datore di lavoro", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                showCalendar();
+                showTableHolidays(new List<Ferie>());
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                showCalendar();
+                showTableHolidays(new List<Ferie>());
 
             }
 
@@ -191,10 +197,14 @@ namespace APL_Project_Client
                 catch (HttpRequestException ex)
                 {
                     MessageBox.Show("Errore nella richiesta: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    showMessageRequestSendFailed();
+                    return;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Errore generico: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    showMessageRequestSendFailed();
+                    return;
                 }
                 //Inserire una progress bar
                 if (response)

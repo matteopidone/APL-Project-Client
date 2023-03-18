@@ -59,7 +59,7 @@ namespace APL_Project_Client
 
                 if (result.found)
                 {
-                    Home homeForm = new Home(new Dipendente(result.name, result.surname, result.email));
+                    Home homeForm = new Home(new Dipendente(result.name, result.surname, result.email, result.token));
                     homeForm.Show();
                     Hide();
                 }

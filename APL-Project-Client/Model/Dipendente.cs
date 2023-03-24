@@ -56,6 +56,13 @@ public class Dipendente
         string jsonRequest = JsonConvert.SerializeObject(parameters);
         HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
         var response = await client.PostAsync("http://localhost:9000/api/login", content);
+
+        if( response.StatusCode == System.Net.HttpStatusCode.BadRequest ) 
+        {
+            r = new LoginAPIResult();
+            r.found = false;
+            return r;
+        }
         if (!response.IsSuccessStatusCode)
         {
             throw new HttpRequestException("Errore, contatta il tuo datore.");
@@ -85,29 +92,32 @@ public class Dipendente
         string content = await response.Content.ReadAsStringAsync(); 
         List<getHolidaysAPIResult> listHolidaysReceived = JsonConvert.DeserializeObject<List<getHolidaysAPIResult>>(content);
 
-        foreach(getHolidaysAPIResult holiday in listHolidaysReceived)
+        if(listHolidaysReceived != null)
         {
-            Ferie f = new Ferie(holiday.day, holiday.month, holiday.year, holiday.message);
-                
-            switch (holiday.type)
+            foreach(getHolidaysAPIResult holiday in listHolidaysReceived)
             {
-                case StatoFerie.Richieste :
-                    listRequestPending.Add(f);
-                    break;
+                Ferie f = new Ferie(holiday.day, holiday.month, holiday.year, holiday.message);
+                
+                switch (holiday.type)
+                {
+                    case StatoFerie.Richieste :
+                        listRequestPending.Add(f);
+                        break;
 
-                case StatoFerie.Accettate :
-                    f.HolidayApproved();
-                    listHolidaysAccepted.Add(f);
-                    break;
+                    case StatoFerie.Accettate :
+                        f.HolidayApproved();
+                        listHolidaysAccepted.Add(f);
+                        break;
 
-                case StatoFerie.Rifiutate :
-                    f.HolidayRefused();
-                    listHolidaysRefused.Add(f);
-                    break;
+                    case StatoFerie.Rifiutate :
+                        f.HolidayRefused();
+                        listHolidaysRefused.Add(f);
+                        break;
+
+                }
 
             }
-
-        }
+        } 
         if( HolidaysAcceptedReceived != null)
         {
             HolidaysAcceptedReceived(this, getDateHolidaysAccepted());

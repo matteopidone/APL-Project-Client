@@ -56,6 +56,13 @@ public class Dipendente
         string jsonRequest = JsonConvert.SerializeObject(parameters);
         HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
         var response = await client.PostAsync("http://localhost:9000/api/login", content);
+
+        if( response.StatusCode == System.Net.HttpStatusCode.BadRequest ) 
+        {
+            r = new LoginAPIResult();
+            r.found = false;
+            return r;
+        }
         if (!response.IsSuccessStatusCode)
         {
             throw new HttpRequestException("Errore, contatta il tuo datore.");

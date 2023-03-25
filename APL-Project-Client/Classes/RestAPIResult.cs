@@ -12,6 +12,7 @@ namespace APL_Project_Client.Classes
         public string name { get; set; }
         public string surname { get; set; }
         public string email { get; set; }
+        public string description { get; set; }
         public string token { get; set; }
     }
     public struct getHolidaysAPIResult

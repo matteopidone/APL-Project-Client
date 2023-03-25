@@ -24,6 +24,7 @@ namespace APL_Project_Client
             InitializeComponent();
             d = d1;
             label1.Text = "Benvenuto " + d.nome + " " + d.cognome;
+            label4.Text = d.descrizione;
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -247,6 +248,11 @@ namespace APL_Project_Client
         }
 
         private void ferieBindingSource_CurrentChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
         {
 
         }

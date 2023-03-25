@@ -57,6 +57,7 @@ namespace APL_Project_Client
             label3.Text = "Vuoi procedere alla richiesta per giorno " + date + "?";
             button2.Visible = true;
             label3.Visible = true;
+            label6.Visible = true;
             textBox1.Visible = true;
         }
 
@@ -66,6 +67,7 @@ namespace APL_Project_Client
             button2.Visible = false;
             textBox1.Text = "";
             textBox1.Visible = false;
+            label6.Visible= false;
             label3.Visible = false;
         }
         private void showHolidaysProgressBar()
@@ -253,6 +255,21 @@ namespace APL_Project_Client
         }
 
         private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label6_Click(object sender, EventArgs e)
         {
 
         }

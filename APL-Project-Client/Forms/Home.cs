@@ -265,6 +265,17 @@ namespace APL_Project_Client
         {
 
         }
+        private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if(e.ColumnIndex == 2)
+            {
+                if (dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString() == "RIFIUTATA")
+                {
+                    e.CellStyle.ForeColor = Color.Red;
+                }
+
+            }
+        }
 
         private void ferieBindingSource_CurrentChanged(object sender, EventArgs e)
         {

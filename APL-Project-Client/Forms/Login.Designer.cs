@@ -58,9 +58,9 @@
             // 
             // textBox2
             // 
-            this.textBox2.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textBox2.Location = new System.Drawing.Point(245, 169);
             this.textBox2.Name = "textBox2";
+            this.textBox2.PasswordChar = '*';
             this.textBox2.Size = new System.Drawing.Size(299, 27);
             this.textBox2.TabIndex = 2;
             this.textBox2.WordWrap = false;

@@ -27,10 +27,6 @@ namespace APL_Project_Client
             label4.Text = d.descrizione;
         }
 
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -187,17 +183,8 @@ namespace APL_Project_Client
                 monthCalendar1.Update();
 
             }
-        }   
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
         }
 
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
         private async void sendHolidayRequest(string motivation)
         {
             try
@@ -256,15 +243,6 @@ namespace APL_Project_Client
             }
         }
 
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
         private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             if(e.ColumnIndex == 2)
@@ -275,31 +253,6 @@ namespace APL_Project_Client
                 }
 
             }
-        }
-
-        private void ferieBindingSource_CurrentChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void dataGridView1_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void label5_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label6_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

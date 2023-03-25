@@ -16,7 +16,7 @@ namespace APL_Project_Client
 {
     public partial class Home : Form
     {
-        Dipendente d;
+        Dipendente d; 
         private DateTime dateSelected;
         SemaphoreSlim semaphoreSendRequest = new SemaphoreSlim(1);
         public Home(Dipendente d1)
@@ -187,32 +187,15 @@ namespace APL_Project_Client
 
         private async void sendHolidayRequest(string motivation)
         {
+            hideFormSendHolidayRequest();
+            hideTableHolidays();
+            showHolidaysProgressBar();
+            progressBar3.Visible = true;
+            bool response = false;
             try
             {
-                hideFormSendHolidayRequest();
-                hideTableHolidays();
-                showHolidaysProgressBar();
-                progressBar3.Visible = true;
-
                 await semaphoreSendRequest.WaitAsync();
-                bool response = false;
-                try
-                {
-                    response = await d.sendHolidayRequest(dateSelected, motivation);
-                }
-                catch (HttpRequestException ex)
-                {
-                    MessageBox.Show("Errore nella richiesta: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    showMessageRequestSendFailed();
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Errore generico: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    showMessageRequestSendFailed();
-                    return;
-                }
-
+                response = await d.sendHolidayRequest(dateSelected, motivation);
                 if (response)
                 {
                     showMessageRequestSendSuccess();
@@ -221,6 +204,18 @@ namespace APL_Project_Client
                 {
                     showMessageRequestSendFailed();
                 }
+            }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show("Errore nella richiesta: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                showMessageRequestSendFailed();
+                return;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Errore generico: " + ex.Message, "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                showMessageRequestSendFailed();
+                return;
             }
             finally
             {

@@ -144,7 +144,7 @@
             // 
             // ferieBindingSource
             // 
-            this.ferieBindingSource.DataSource = typeof(APL_Project_Client.Model.Ferie);
+            this.ferieBindingSource.DataSource = typeof(APL_Project_Client.Classes.Ferie);
             this.ferieBindingSource.CurrentChanged += new System.EventHandler(this.ferieBindingSource_CurrentChanged);
             // 
             // textBox1

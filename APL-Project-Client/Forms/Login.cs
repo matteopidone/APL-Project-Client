@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using System.Text;
 using Newtonsoft.Json;
-using APL_Project_Client.Model;
+using APL_Project_Client.Classes;
 
 namespace APL_Project_Client
 {

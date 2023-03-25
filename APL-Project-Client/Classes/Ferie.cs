@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace APL_Project_Client.Model;
+namespace APL_Project_Client.Classes;
 public enum StatoFerie
 {
     Richieste,

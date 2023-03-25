@@ -9,6 +9,7 @@ public class Dipendente
 { //Farlo come classe astratta, poi dividere in Utente e Collega
     public string nome;
     public string cognome;
+    public string descrizione;
     public string email;
     public string token;
     // Lista di richieste di ferie accettate.
@@ -20,11 +21,12 @@ public class Dipendente
 
     public event EventHandler<List<DateTime>> HolidaysAcceptedReceived;
     public event EventHandler<List<Ferie>> HolidaysPendingUpdated;
-    public Dipendente(string nome, string cognome, string email, string token)
+    public Dipendente(string nome, string cognome, string email, string descrizione, string token)
 	{
         this.nome = nome;
         this.cognome = cognome; 
         this.email = email;
+        this.descrizione = descrizione;
         this.token = token;
         listRequestPending = new List<Ferie>();
         listHolidaysAccepted= new List<Ferie>();

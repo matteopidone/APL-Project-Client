@@ -40,6 +40,7 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.ferieBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ferieBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -155,11 +156,23 @@
             this.textBox1.TabIndex = 9;
             this.textBox1.Visible = false;
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Segoe UI", 16.2F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point);
+            this.label4.Location = new System.Drawing.Point(789, 445);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(266, 38);
+            this.label4.TabIndex = 10;
+            this.label4.Text = "Descrizione Utente";
+            this.label4.Click += new System.EventHandler(this.label4_Click);
+            // 
             // Home
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1483, 735);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.progressBar2);
@@ -195,5 +208,6 @@
         private DataGridView dataGridView1;
         private BindingSource ferieBindingSource;
         private TextBox textBox1;
+        private Label label4;
     }
 }

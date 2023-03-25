@@ -43,6 +43,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.progressBar3 = new System.Windows.Forms.ProgressBar();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ferieBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -191,11 +192,21 @@
             this.label6.Visible = false;
             this.label6.Click += new System.EventHandler(this.label6_Click);
             // 
+            // progressBar3
+            // 
+            this.progressBar3.Location = new System.Drawing.Point(210, 500);
+            this.progressBar3.MarqueeAnimationSpeed = 30;
+            this.progressBar3.Name = "progressBar3";
+            this.progressBar3.Size = new System.Drawing.Size(125, 29);
+            this.progressBar3.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.progressBar3.TabIndex = 13;
+            // 
             // Home
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(974, 649);
+            this.Controls.Add(this.progressBar3);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
@@ -236,5 +247,6 @@
         private Label label4;
         private Label label5;
         private Label label6;
+        private ProgressBar progressBar3;
     }
 }

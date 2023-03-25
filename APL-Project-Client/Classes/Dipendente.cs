@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 
-namespace APL_Project_Client.Model;
+namespace APL_Project_Client.Classes;
 public class Dipendente
 { //Farlo come classe astratta, poi dividere in Utente e Collega
     public string nome;

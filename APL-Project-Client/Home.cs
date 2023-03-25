@@ -1,4 +1,4 @@
-﻿using APL_Project_Client.Model;
+﻿using APL_Project_Client.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

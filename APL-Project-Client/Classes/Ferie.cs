@@ -82,7 +82,7 @@ public class Ferie
     public DateTime date { get; set; }
 
     // Motivazione.
-    public string motivatione { get; set; }
+    public string motivazione { get; set; }
 
     // Proprietà che serve al componente del form Home (DataGridView)
     // che mette in tabella le richieste in attesa e rifiutate.
@@ -107,13 +107,13 @@ public class Ferie
     }
 
     // Costruttore.
-    public Ferie(int day, int month, int year, string motivatione)
+    public Ferie(int day, int month, int year, string motivazione)
     {
         //Stato iniziale "Richiesta IN ATTESA".
         stato = new FerieRichieste();
 
         date = new DateTime(year, month, day);
-        this.motivatione = motivatione;
+        this.motivazione = motivazione;
     }
 
     // Setter dello stato.

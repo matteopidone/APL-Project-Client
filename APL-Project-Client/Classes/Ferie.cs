@@ -39,6 +39,7 @@ public class FerieAccettate : IFerieState
 {
     public void HolidayApproved(Ferie ferie)
     {
+        // Non si può accettare una richiesta già accettata.
         throw new InvalidOperationException("Le ferie sono già state accettate");
     }
 
@@ -62,6 +63,7 @@ public class FerieRifiutate : IFerieState
 
     public void HolidayRefused(Ferie ferie)
     {
+        // Non si può rifiutare una richiesta già rifiutata.
         throw new InvalidOperationException("Le ferie sono già state rifiutate");
     }
     public HolidayType getType()

@@ -12,15 +12,22 @@ public class Dipendente
     public string descrizione;
     public string email;
     public string token;
+
     // Lista di richieste di ferie accettate.
     private List<Ferie> listHolidaysAccepted;
+    
     // Lista di richieste di ferie in attesa.
     private List<Ferie> listRequestPending;
+    
     // Lista di richiese di ferie rifiutate.
     private List<Ferie> listHolidaysRefused;
 
+    // Evento "Le date delle richieste ACCETTATE sono state aggiornate".
     public event EventHandler<List<DateTime>> HolidaysAcceptedReceived;
+
+    // Evento "Le richieste IN ATTESA e RIFIUTATE sono state aggiornate".
     public event EventHandler<List<Ferie>> HolidaysPendingUpdated;
+    
     public Dipendente(string nome, string cognome, string email, string descrizione, string token)
 	{
         this.nome = nome;
@@ -210,7 +217,7 @@ public class Dipendente
     {
         if (listRequestPending.Count != 0)
         {
-            return listRequestPending.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
+           return listRequestPending.Any(holiday => holiday.date.Year == holiday.date.Year && holiday.date.Month == holiday.date.Month && holiday.date.Day == date.Day);
         }
         return false;
     }

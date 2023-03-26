@@ -16,18 +16,30 @@ namespace APL_Project_Client
 {
     public partial class Home : Form
     {
-        Dipendente d; 
+        // Istanza del dipendente utilizzata nel form.
+        Dipendente d;
+        
+        // Data selezionata dall'utente per inviare la richiesta.
         private DateTime dateSelected;
-        // Istanza di un semaforo con un count pari a 1.
+
+        // Istanza di un semaforo con una dimensione dello slot pari a 1.
         SemaphoreSlim semaphoreSendRequest = new SemaphoreSlim(1);
+
+        // Costruttore.
         public Home(Dipendente d1)
         {
             InitializeComponent();
+
+            // Associo l'istanza del dipendente.
             d = d1;
+            
+            // Valorizzo il messaggio di benvenuto e la descrizione del dipendente.
             label1.Text = "Benvenuto " + d.nome + " " + d.cognome;
             label4.Text = d.descrizione;
         }
 
+        // Al load del form, invoco l'api che ritorna le informazioni
+        // su tutte le richieste (ACCETTATE, IN ATTESA, RIFIUTATE).
         private void Home_Load(object sender, EventArgs e)
         {
             fetchAllHolidays();
@@ -35,12 +47,12 @@ namespace APL_Project_Client
 
         private async void fetchAllHolidays()
         {
-            // Definisco associo gli handler agli eventi esposti per popolare la Home.
+            // Definisco gli handler agli eventi esposti per popolare la Home.
             d.HolidaysAcceptedReceived += HolidaysReceiveHandler;
             d.HolidaysPendingUpdated += RequestHolidaysUpdatedHandler;
             try
             {
-                //Metodo per la rierca di richieste.
+                // Metodo per la rierca di richieste.
                 await d.fetchHolidays();
 
             }
@@ -70,6 +82,7 @@ namespace APL_Project_Client
             }
         }
 
+        // Metodo che inoltra una richiesta di ferie.
         private async void sendHolidayRequest(string motivation)
         {
             hideFormSendHolidayRequest();
@@ -79,7 +92,7 @@ namespace APL_Project_Client
             bool response = false;
             try
             {
-                // Lock sul semaforo.
+                // Acquisico lo slot del semaforo.
                 await semaphoreSendRequest.WaitAsync();
                 // Inoltro la richiesta.
                 response = await d.sendHolidayRequest(dateSelected, motivation);
@@ -106,7 +119,7 @@ namespace APL_Project_Client
             }
             finally
             {
-                // Relese sul semaforo.
+                // Rilascio lo slot.
                 semaphoreSendRequest.Release();
                 showTableHolidays();
             }
@@ -132,12 +145,16 @@ namespace APL_Project_Client
         private void monthCalendar1_DateChanged(object sender, DateRangeEventArgs e)
         {
             DateTime date = e.Start;
-            // Se nessuno ha il lock sul semaforo, ovvero se non si sta aspettando l'esito di un invio di una richiesta, permetto di inserire una nuova richiesta.
+            // Se nessuno ha acquisito lo slot del semaforo,
+            // ovvero se non si sta aspettando l'esito di un invio di una richiesta,
+            // permetto di inserire una nuova richiesta.
             if (semaphoreSendRequest.CurrentCount == 1)
             {
-                // Se ho già fatto richiesta per quel giorno e sono in attesa di esito, mostro il messaggio "Hai già fatto richiesta".
+                // Se ho già fatto richiesta per quel giorno e sono in attesa di esito,
+                // mostro il messaggio "Hai già fatto richiesta".
                 if (d.isHolidayPending(date))
                 {
+                    hideFormSendHolidayRequest();
                     showAlreadyRequestedMessage(date.ToString("d"));
 
                 }
@@ -145,6 +162,7 @@ namespace APL_Project_Client
                 // mostro il form di invio della richiesta.
                 else if (!d.isHolidayAccepted(date) && !IsWeekend(date) && date > DateTime.Now)
                 {
+                    // Imposto la data selezionata.
                     dateSelected = date;
                     showFormSendHolidayRequest(dateSelected.ToString("d"));
                 }
@@ -230,6 +248,7 @@ namespace APL_Project_Client
         {
             return date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
         }
+        // Data in input una lista di date, valorizzo nel calendario le richieste ACCETTATE.
         private void addHolidaysToCalendar(in List<DateTime> dates)
         {
             foreach (DateTime date in dates)
@@ -240,6 +259,7 @@ namespace APL_Project_Client
             }
         }
 
+        //Se la data è stata selezionata, inoltro la richiesta.
         private void button2_Click(object sender, EventArgs e)
         {
             if(dateSelected != null)

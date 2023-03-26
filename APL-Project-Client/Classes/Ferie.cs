@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace APL_Project_Client.Classes;
+// Queste classi definiscono lo stato di una richiesta di ferie (Accettata, Rifiutata, In attesa).
+// Viene utilizzato il pattern "State".
+
+// Interfaccia IFerieState.
 public interface IFerieState
 {
     void HolidayApproved(Ferie ferie);
@@ -12,6 +16,7 @@ public interface IFerieState
     HolidayType getType();
 }
 
+// Stato "Richiesta di ferie in attesa di essere accettata".
 public class FerieRichieste : IFerieState
 {
     public void HolidayApproved(Ferie ferie)
@@ -29,6 +34,7 @@ public class FerieRichieste : IFerieState
     }
 }
 
+// Stato "Richiesta di ferie accettata".
 public class FerieAccettate : IFerieState
 {
     public void HolidayApproved(Ferie ferie)
@@ -46,6 +52,7 @@ public class FerieAccettate : IFerieState
     }
 }
 
+// Stato "Richiesta di ferie rifiutata".
 public class FerieRifiutate : IFerieState
 {
     public void HolidayApproved(Ferie ferie)
@@ -63,13 +70,20 @@ public class FerieRifiutate : IFerieState
     }
 }
 
+// Classe Ferie.
 public class Ferie
 {
     // Stato della richiesta.
     private IFerieState stato;
+
+    // Data della richiesta.
     public DateTime date { get; set; }
+
+    // Motivazione.
     public string motivatione { get; set; }
-    //Proprietà che serve al componente che mette in tabella le richieste pendenti e rifiutate
+
+    // Proprietà che serve al componente del form Home (DataGridView)
+    // che mette in tabella le richieste in attesa e rifiutate.
     public string Esito
     {
         get
@@ -103,11 +117,14 @@ public class Ferie
     {
         set { stato = value; }
     }
+
+    // Approva richiesta.
     public void HolidayApproved()
     {
         stato.HolidayApproved(this);
     }
 
+    // Rifiuta richiesta.
     public void HolidayRefused()
     {
         stato.HolidayRefused(this);

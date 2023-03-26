@@ -47,16 +47,22 @@ namespace APL_Project_Client
             progressBar1.Visible = false;
             monthCalendar1.Visible = true;
         }
-        private void showTableHolidays(List<Ferie> f)
+        private void showTableHolidays()
         {
-            dataGridView1.DataSource = f;
+            progressBar3.Visible = false;
             dataGridView1.Visible = true;
+        }
+        private void hideTableHolidays()
+        {
+            progressBar3.Visible = true;
+            dataGridView1.Visible = false;
         }
         private void showFormSendHolidayRequest(string date)
         {
             label3.Text = "Vuoi procedere alla richiesta per giorno " + date + "?";
             button2.Visible = true;
             label3.Visible = true;
+            label6.Visible = true;
             textBox1.Visible = true;
         }
 
@@ -66,6 +72,7 @@ namespace APL_Project_Client
             button2.Visible = false;
             textBox1.Text = "";
             textBox1.Visible = false;
+            label6.Visible= false;
             label3.Visible = false;
         }
         private void showHolidaysProgressBar()
@@ -79,7 +86,10 @@ namespace APL_Project_Client
         }
         private void RequestHolidaysUpdatedHandler(object sender, List<Ferie> e)
         {
-            showTableHolidays(e);
+            progressBar3.Visible = false;
+            // Inserisco gli elementi nella tabella.
+            dataGridView1.DataSource = e;
+            showTableHolidays();
         }
         private void showAlreadyRequestedMessage(string day)
         {
@@ -91,12 +101,14 @@ namespace APL_Project_Client
             label3.Text = "Richiesta di ferie inoltrata con successo!";
             progressBar2.Visible = false;
             label3.Visible = true;
+            progressBar3.Visible = false;
         }
         private void showMessageRequestSendFailed()
         {
             label3.Text = "Impossibile inoltrare la richiesta.";
             progressBar2.Visible = false;
             label3.Visible = true;
+            progressBar3.Visible = false;
         }
         private async void fetchAllHolidays()
         {
@@ -112,22 +124,26 @@ namespace APL_Project_Client
             {
                 MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 showCalendar();
-                showTableHolidays(new List<Ferie>());
+                // Inserisco una tabella vuota.
+                dataGridView1.DataSource = new List<Ferie>();
+                showTableHolidays();
             }
             catch (InvalidOperationException ex )
             {
                 MessageBox.Show("Errore :" + ex.Message +"\nContattare il tuo datore di lavoro", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 showCalendar();
-                showTableHolidays(new List<Ferie>());
+                // Inserisco una tabella vuota.
+                dataGridView1.DataSource = new List<Ferie>();
+                showTableHolidays();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 showCalendar();
-                showTableHolidays(new List<Ferie>());
-
+                // Inserisco una tabella vuota.
+                dataGridView1.DataSource = new List<Ferie>();
+                showTableHolidays();
             }
-
         }
 
         private void Home_Load(object sender, EventArgs e)
@@ -187,7 +203,9 @@ namespace APL_Project_Client
             try
             {
                 hideFormSendHolidayRequest();
+                hideTableHolidays();
                 showHolidaysProgressBar();
+                progressBar3.Visible = true;
 
                 await semaphoreSendRequest.WaitAsync();
                 bool response = false;
@@ -207,7 +225,7 @@ namespace APL_Project_Client
                     showMessageRequestSendFailed();
                     return;
                 }
-                //Inserire una progress bar
+
                 if (response)
                 {
                     showMessageRequestSendSuccess();
@@ -220,6 +238,7 @@ namespace APL_Project_Client
             finally
             {
                 semaphoreSendRequest.Release();
+                showTableHolidays();
             }
         }
 
@@ -246,6 +265,17 @@ namespace APL_Project_Client
         {
 
         }
+        private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if(e.ColumnIndex == 2)
+            {
+                if (dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString() == "RIFIUTATA")
+                {
+                    e.CellStyle.ForeColor = Color.Red;
+                }
+
+            }
+        }
 
         private void ferieBindingSource_CurrentChanged(object sender, EventArgs e)
         {
@@ -253,6 +283,21 @@ namespace APL_Project_Client
         }
 
         private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label6_Click(object sender, EventArgs e)
         {
 
         }

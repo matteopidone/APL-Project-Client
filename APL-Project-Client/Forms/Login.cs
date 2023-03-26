@@ -37,6 +37,7 @@ namespace APL_Project_Client
 
             if (email.Length != 0 && password.Length != 0 && isValidEmail)
             {
+                button1.Visible = false;
                 showProgressBarLogin();
                 LoginAPIResult result;
 
@@ -48,12 +49,14 @@ namespace APL_Project_Client
                 {
                     MessageBox.Show("Errore nella richiesta: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     hideProgressBarLogin();
+                    button1.Visible = true;
                     return;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Errore generico: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     hideProgressBarLogin();
+                    button1.Visible = true;
                     return;
                 }
 
@@ -67,6 +70,7 @@ namespace APL_Project_Client
                 {
                     MessageBox.Show("Username o Password errati, riprova o contatta il tuo datore di lavoro", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     hideProgressBarLogin();
+                    button1.Visible = true;
                     return;
                 }
 
@@ -75,6 +79,7 @@ namespace APL_Project_Client
             {
                 MessageBox.Show("Inserisci tutti i dati o inserisci una mail valida", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 hideProgressBarLogin();
+                button1.Visible = true;
                 return;
 
             }

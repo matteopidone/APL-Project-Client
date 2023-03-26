@@ -109,7 +109,9 @@ public class Ferie
     // Costruttore.
     public Ferie(int day, int month, int year, string motivatione)
     {
+        //Stato iniziale "Richiesta IN ATTESA".
         stato = new FerieRichieste();
+
         date = new DateTime(year, month, day);
         this.motivatione = motivatione;
     }

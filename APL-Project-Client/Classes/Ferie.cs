@@ -73,9 +73,7 @@ public class Ferie
 {
     private IFerieState stato;
     public DateTime date { get; set; }
-    public string motivation { get; set; }
-    public static int ferieRimanenti;
-    public static int ferieUtilizzate;
+    public string motivatione { get; set; }
     //Proprietà che serve al componente che mette in tabella le richieste pendenti e rifiutate
     public string Esito
     {
@@ -83,7 +81,7 @@ public class Ferie
         {
             if (stato.getState() is StatoFerie.Richieste)
             {
-                return ("RICHIESTA");
+                return ("IN ATTESA");
             }
             else if (stato.getState() is StatoFerie.Accettate)
             {
@@ -98,11 +96,11 @@ public class Ferie
     }
 
 
-    public Ferie(int day, int month, int year, string motivation)
+    public Ferie(int day, int month, int year, string motivatione)
     {
         stato = new FerieRichieste();
         date = new DateTime(year, month, day);
-        this.motivation = motivation;
+        motivatione = motivatione;
     }
 
     public void HolidayApproved()

@@ -226,11 +226,11 @@ namespace APL_Project_Client
             progressBar3.Visible = false;
         }
 
-        private bool IsWeekend(DateTime date)
+        private bool IsWeekend(in DateTime date)
         {
             return date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
         }
-        private void addHolidaysToCalendar(List<DateTime> dates)
+        private void addHolidaysToCalendar(in List<DateTime> dates)
         {
             foreach (DateTime date in dates)
             {

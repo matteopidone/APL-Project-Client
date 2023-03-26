@@ -50,7 +50,7 @@ public class Dipendente
         using ( HttpClient client = new HttpClient() )
         {
             // Inserisco i parametri della richiesta.
-            Dictionary<string, string> parameters = new Dictionary<string, string> { { "email", email }, { "password", password } };
+            Dictionary<string, string> parameters = new Dictionary<string, string> { { "email", email }, { "password", password }, { "role", "0" } };
             string jsonRequest = JsonConvert.SerializeObject(parameters);
             HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
         

@@ -22,11 +22,6 @@ namespace APL_Project_Client
         }
         private async void sendLoginRequest(string email, string password)
         {
-            //byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-            //byte[] hashedBytes = new SHA256Managed().ComputeHash(passwordBytes);
-            //string hashedPassword = Convert.ToBase64String(hashedBytes);
-            string hashedPassword = password;
-
             bool isValidEmail = Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
 
             if (email.Length != 0 && password.Length != 0 && isValidEmail)

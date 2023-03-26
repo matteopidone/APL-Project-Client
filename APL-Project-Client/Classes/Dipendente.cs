@@ -47,144 +47,149 @@ public class Dipendente
         // Stuttura che conterrà la risposta del server.
         LoginAPIResult r;
         
-        HttpClient client = new HttpClient();
-        
-        // Inserisco i parametri della richiesta.
-        Dictionary<string, string> parameters = new Dictionary<string, string> { { "email", email }, { "password", password } };
-        string jsonRequest = JsonConvert.SerializeObject(parameters);
-        HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
-        
-        // Invio la richiesta.
-        var response = await client.PostAsync("http://localhost:9000/api/login", content);
-
-        if( response.StatusCode == System.Net.HttpStatusCode.BadRequest ) 
+        using ( HttpClient client = new HttpClient() )
         {
-            //Se lo status code è 400, login fallito.
-            r = new LoginAPIResult();
-            r.found = false;
+            // Inserisco i parametri della richiesta.
+            Dictionary<string, string> parameters = new Dictionary<string, string> { { "email", email }, { "password", password } };
+            string jsonRequest = JsonConvert.SerializeObject(parameters);
+            HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
+        
+            // Invio la richiesta.
+            var response = await client.PostAsync("http://localhost:9000/api/login", content);
+
+            if( response.StatusCode == System.Net.HttpStatusCode.BadRequest ) 
+            {
+                //Se lo status code è 400, login fallito.
+                r = new LoginAPIResult();
+                r.found = false;
+                return r;
+            }
+            if (!response.IsSuccessStatusCode)
+            {
+                // Se lo status code è diverso da 200.
+                throw new HttpRequestException("Errore, contatta il tuo datore.");
+            }
+            // Prendo il contenuto della risposta e lo torno al Form.
+            string result = await response.Content.ReadAsStringAsync();
+            r = JsonConvert.DeserializeObject<LoginAPIResult>(result);
             return r;
         }
-        if (!response.IsSuccessStatusCode)
-        {
-            // Se lo status code è diverso da 200.
-            throw new HttpRequestException("Errore, contatta il tuo datore.");
-        }
-        // Prendo il contenuto della risposta e lo torno al Form.
-        string result = await response.Content.ReadAsStringAsync();
-        r = JsonConvert.DeserializeObject<LoginAPIResult>(result);
-        return r;
+        
 
     }
     // Metodo che ricerca tutte le ferie (pendenti, accettate, rifiutate e torna al chiamante un boooleano.
     public async Task<bool> fetchHolidays()
     {
         HttpResponseMessage response;
-        HttpClient client = new HttpClient();
-
-        // Costruisco la richiesta, inserendo il token per autenticarla.
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        UriBuilder uriBuilder = new UriBuilder("http://localhost:9000/api/getHolidays");
-        uriBuilder.Query = "email=" + email;
-        response = await client.GetAsync(uriBuilder.ToString());
-
-        // Se la richiesta non è andata a buon fine.
-        if (!response.IsSuccessStatusCode)
+        using ( HttpClient client = new HttpClient() )
         {
-            throw new HttpRequestException("Errore nel caricamento delle tue ferie, contatta il tuo datore.");
-        }
+            // Costruisco la richiesta, inserendo il token per autenticarla.
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            UriBuilder uriBuilder = new UriBuilder("http://localhost:9000/api/getHolidays");
+            uriBuilder.Query = "email=" + email;
+            response = await client.GetAsync(uriBuilder.ToString());
 
-        // Leggo il contenuto della risposta.
-        string content = await response.Content.ReadAsStringAsync();
-        
-        //Leggo il JSON di risposta deserializzandolo nel tipo appropriato.
-        List<getHolidaysAPIResult> listHolidaysReceived = JsonConvert.DeserializeObject<List<getHolidaysAPIResult>>(content);
-        
-        // Utilizzo la risposta del server per costruire rispettivamente il listato di ferie Richieste/Pendenti, Accettate e Rifiutate. 
-        if(listHolidaysReceived != null)
-        {
-            foreach(getHolidaysAPIResult holiday in listHolidaysReceived)
+            // Se la richiesta non è andata a buon fine.
+            if (!response.IsSuccessStatusCode)
             {
-                Ferie f = new Ferie(holiday.day, holiday.month, holiday.year, holiday.message);
-                
-                switch (holiday.type)
+                throw new HttpRequestException("Errore nel caricamento delle tue ferie, contatta il tuo datore.");
+            }
+
+            // Leggo il contenuto della risposta.
+            string content = await response.Content.ReadAsStringAsync();
+
+            //Leggo il JSON di risposta deserializzandolo nel tipo appropriato.
+            List<getHolidaysAPIResult> listHolidaysReceived = JsonConvert.DeserializeObject<List<getHolidaysAPIResult>>(content);
+        
+            // Utilizzo la risposta del server per costruire rispettivamente il listato di ferie Richieste/Pendenti, Accettate e Rifiutate. 
+            if(listHolidaysReceived != null)
+            {
+                foreach(getHolidaysAPIResult holiday in listHolidaysReceived)
                 {
-                    case HolidayType.Pending :
-                        // Aggiungo nel listato di ferie Richieste/Pendenti.
-                        listRequestPending.Add(f);
-                        break;
+                    Ferie f = new Ferie(holiday.day, holiday.month, holiday.year, holiday.message);
+                
+                    switch (holiday.type)
+                    {
+                        case HolidayType.Pending :
+                            // Aggiungo nel listato di ferie Richieste/Pendenti.
+                            listRequestPending.Add(f);
+                            break;
 
-                    case HolidayType.Accepted :
-                        // Aggiungo nel listato di ferie Accettate.
-                        f.HolidayApproved();
-                        listHolidaysAccepted.Add(f);
-                        break;
+                        case HolidayType.Accepted :
+                            // Aggiungo nel listato di ferie Accettate.
+                            f.HolidayApproved();
+                            listHolidaysAccepted.Add(f);
+                            break;
 
-                    case HolidayType.Refused :
-                        // Aggiungo nel listato di ferie Rifiutate.
-                        f.HolidayRefused();
-                        listHolidaysRefused.Add(f);
-                        break;
+                        case HolidayType.Refused :
+                            // Aggiungo nel listato di ferie Rifiutate.
+                            f.HolidayRefused();
+                            listHolidaysRefused.Add(f);
+                            break;
+
+                    }
 
                 }
-
             }
+            // Se gli event handler sono valorizzati, lancio gli eventi.
+            if( HolidaysAcceptedReceived != null)
+            {
+                // Evento che notifica l'aggiornamento delle ferie Accettate.
+                HolidaysAcceptedReceived(this, getDateHolidaysAccepted());
+            }
+            if (HolidaysPendingUpdated != null)
+            {
+                // Evento che notifica l'aggiornamento delle ferie Richieste/Pendenti e Rifiutate.
+                HolidaysPendingUpdated(this, getHolidaysPendingAndRefused());
+            }
+            return true;
         }
-        // Se gli event handler sono valorizzati, lancio gli eventi.
-        if( HolidaysAcceptedReceived != null)
-        {
-            // Evento che notifica l'aggiornamento delle ferie Accettate.
-            HolidaysAcceptedReceived(this, getDateHolidaysAccepted());
-        }
-        if (HolidaysPendingUpdated != null)
-        {
-            // Evento che notifica l'aggiornamento delle ferie Richieste/Pendenti e Rifiutate.
-            HolidaysPendingUpdated(this, getHolidaysPendingAndRefused());
-        }
-        return true;
+       
     }
 
     // Metodo che permette di inviare una richiesta di ferie (Pendente).
     public async Task<bool> sendHolidayRequest(DateTime date, string motivation)
     {
         HttpResponseMessage response;
-        HttpClient client = new HttpClient();
-
-        // Inserisco il token per autenticare la richiesta.
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-        // Inserisco i parametri della richiesta.
-        Dictionary<string, object> parameters = new Dictionary<string, object> { { "email", email }, { "year", date.Year }, { "month", date.Month }, { "day", date.Day }, { "message", motivation } };
-        string jsonRequest = JsonConvert.SerializeObject(parameters);
-        HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
-        
-        // Invio la richiesta.
-        response = await client.PostAsync("http://localhost:9000/api/insertHoliday", content);
-        
-        if (!response.IsSuccessStatusCode)
+        using ( HttpClient client = new HttpClient() )
         {
-            throw new HttpRequestException("Errore nell'invio della richiesta, contatta il tuo datore.");
-        }
+            // Inserisco il token per autenticare la richiesta.
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        string Resultcontent = await response.Content.ReadAsStringAsync();
+            // Inserisco i parametri della richiesta.
+            Dictionary<string, object> parameters = new Dictionary<string, object> { { "email", email }, { "year", date.Year }, { "month", date.Month }, { "day", date.Day }, { "message", motivation } };
+            string jsonRequest = JsonConvert.SerializeObject(parameters);
+            HttpContent content = new StringContent(jsonRequest, System.Text.Encoding.UTF8, "application/json");
         
-        //Leggo il JSON di risposta deserializzandolo nel tipo appropriato.
-        insertHolidayAPIResult json = JsonConvert.DeserializeObject<insertHolidayAPIResult>(Resultcontent);
+            // Invio la richiesta.
+            response = await client.PostAsync("http://localhost:9000/api/insertHoliday", content);
         
-        // Se l'invio della richiesta ha successo, lo inserisco nel listato esistente
-        // e notifico gli handler associati (nel nostro caso il form Home).
-        if (json.result)
-        {
-            Ferie f = new Ferie(date.Day, date.Month, date.Year, motivation);
-            listRequestPending.Add(f);
-            if (HolidaysPendingUpdated != null)
+            if (!response.IsSuccessStatusCode)
             {
-                HolidaysPendingUpdated(this, getHolidaysPendingAndRefused());
+                throw new HttpRequestException("Errore nell'invio della richiesta, contatta il tuo datore.");
             }
-            // Torno true.
-            return true;
+
+            string Resultcontent = await response.Content.ReadAsStringAsync();
+        
+            //Leggo il JSON di risposta deserializzandolo nel tipo appropriato.
+            insertHolidayAPIResult json = JsonConvert.DeserializeObject<insertHolidayAPIResult>(Resultcontent);
+        
+            // Se l'invio della richiesta ha successo, lo inserisco nel listato esistente
+            // e notifico gli handler associati (nel nostro caso il form Home).
+            if (json.result)
+            {
+                Ferie f = new Ferie(date.Day, date.Month, date.Year, motivation);
+                listRequestPending.Add(f);
+                if (HolidaysPendingUpdated != null)
+                {
+                    HolidaysPendingUpdated(this, getHolidaysPendingAndRefused());
+                }
+
+                return true;
+            }
+
+            return false;
         }
-        // Torno false, richiesta fallita. 
-        return false;
     }
 
     // Metodo che torna una lista con i giorni di ferie accettati.
@@ -204,7 +209,7 @@ public class Dipendente
     }
 
     // Metodo che indica se per quella data sono in ferie (Richiesta Accettata).
-    public bool isHolidayAccepted(DateTime date)
+    public bool isHolidayAccepted(in DateTime date)
     {
         if( listHolidaysAccepted.Count != 0)
         {
@@ -213,7 +218,7 @@ public class Dipendente
         return false;
     }
     // Metodo che indica se per quella data ho fatto richiesta di ferie (Richiesta Pendente).
-    public bool isHolidayPending(DateTime date)
+    public bool isHolidayPending(in DateTime date)
     {
         if (listRequestPending.Count != 0)
         {

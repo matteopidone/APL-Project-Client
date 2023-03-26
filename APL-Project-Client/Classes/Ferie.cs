@@ -5,19 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace APL_Project_Client.Classes;
-public enum StatoFerie
-{
-    Richieste,
-    Accettate,
-    Rifiutate
-}
+// Queste classi definiscono lo stato di una richiesta di ferie (Accettata, Rifiutata, In attesa).
+// Viene utilizzato il pattern "State".
+
+// Interfaccia IFerieState.
 public interface IFerieState
 {
     void HolidayApproved(Ferie ferie);
     void HolidayRefused(Ferie ferie);
-    StatoFerie getState();
+    HolidayType getType();
 }
 
+// Stato "Richiesta di ferie in attesa di essere accettata".
 public class FerieRichieste : IFerieState
 {
     public void HolidayApproved(Ferie ferie)
@@ -29,16 +28,18 @@ public class FerieRichieste : IFerieState
     {
         ferie.Stato = new FerieRifiutate();
     }
-    public StatoFerie getState()
+    public HolidayType getType()
     {
-        return StatoFerie.Richieste;
+        return HolidayType.Pending;
     }
 }
 
+// Stato "Richiesta di ferie accettata".
 public class FerieAccettate : IFerieState
 {
     public void HolidayApproved(Ferie ferie)
     {
+        // Non si può accettare una richiesta già accettata.
         throw new InvalidOperationException("Le ferie sono già state accettate");
     }
 
@@ -46,12 +47,13 @@ public class FerieAccettate : IFerieState
     {
         ferie.Stato = new FerieRifiutate();
     }
-    public StatoFerie getState()
+    public HolidayType getType()
     {
-        return StatoFerie.Accettate;
+        return HolidayType.Accepted;
     }
 }
 
+// Stato "Richiesta di ferie rifiutata".
 public class FerieRifiutate : IFerieState
 {
     public void HolidayApproved(Ferie ferie)
@@ -61,35 +63,42 @@ public class FerieRifiutate : IFerieState
 
     public void HolidayRefused(Ferie ferie)
     {
+        // Non si può rifiutare una richiesta già rifiutata.
         throw new InvalidOperationException("Le ferie sono già state rifiutate");
     }
-    public StatoFerie getState()
+    public HolidayType getType()
     {
-        return StatoFerie.Rifiutate;
+        return  HolidayType.Refused;
     }
 }
 
+// Classe Ferie.
 public class Ferie
 {
+    // Stato della richiesta.
     private IFerieState stato;
+
+    // Data della richiesta.
     public DateTime date { get; set; }
-    public string motivation { get; set; }
-    public static int ferieRimanenti;
-    public static int ferieUtilizzate;
-    //Proprietà che serve al componente che mette in tabella le richieste pendenti e rifiutate
+
+    // Motivazione.
+    public string motivatione { get; set; }
+
+    // Proprietà che serve al componente del form Home (DataGridView)
+    // che mette in tabella le richieste in attesa e rifiutate.
     public string Esito
     {
         get
         {
-            if (stato.getState() is StatoFerie.Richieste)
+            if (stato.getType() is HolidayType.Pending)
             {
-                return ("RICHIESTA");
+                return ("IN ATTESA");
             }
-            else if (stato.getState() is StatoFerie.Accettate)
+            else if (stato.getType() is HolidayType.Accepted)
             {
                 return ("ACCETTATA");
             }
-            else if (stato.getState() is StatoFerie.Rifiutate)
+            else if (stato.getType() is HolidayType.Refused)
             {
                 return ("RIFIUTATA");
             }
@@ -97,28 +106,34 @@ public class Ferie
         }
     }
 
-
-    public Ferie(int day, int month, int year, string motivation)
+    // Costruttore.
+    public Ferie(int day, int month, int year, string motivatione)
     {
+        //Stato iniziale "Richiesta IN ATTESA".
         stato = new FerieRichieste();
+
         date = new DateTime(year, month, day);
-        this.motivation = motivation;
+        this.motivatione = motivatione;
     }
 
+    // Setter dello stato.
+    public IFerieState Stato
+    {
+        set { stato = value; }
+    }
+
+    // Approva richiesta.
     public void HolidayApproved()
     {
         stato.HolidayApproved(this);
     }
 
+    // Rifiuta richiesta.
     public void HolidayRefused()
     {
         stato.HolidayRefused(this);
     }
 
-    public IFerieState Stato
-    {
-        set { stato = value; }
-    }
 }
 
 

@@ -101,7 +101,7 @@ public class Ferie
     {
         stato = new FerieRichieste();
         date = new DateTime(year, month, day);
-        motivatione = motivatione;
+        this.motivatione = motivatione;
     }
 
     // Setter dello stato.

@@ -71,6 +71,7 @@ public class FerieRifiutate : IFerieState
 
 public class Ferie
 {
+    // Stato della richiesta.
     private IFerieState stato;
     public DateTime date { get; set; }
     public string motivatione { get; set; }
@@ -95,7 +96,7 @@ public class Ferie
         }
     }
 
-
+    // Costruttore.
     public Ferie(int day, int month, int year, string motivatione)
     {
         stato = new FerieRichieste();
@@ -103,6 +104,11 @@ public class Ferie
         motivatione = motivatione;
     }
 
+    // Setter dello stato.
+    public IFerieState Stato
+    {
+        set { stato = value; }
+    }
     public void HolidayApproved()
     {
         stato.HolidayApproved(this);
@@ -113,10 +119,6 @@ public class Ferie
         stato.HolidayRefused(this);
     }
 
-    public IFerieState Stato
-    {
-        set { stato = value; }
-    }
 }
 
 

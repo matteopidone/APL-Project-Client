@@ -57,7 +57,6 @@
             this.label1.Size = new System.Drawing.Size(110, 31);
             this.label1.TabIndex = 0;
             this.label1.Text = "Welcome";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // button1
             // 
@@ -87,7 +86,6 @@
             this.label2.Size = new System.Drawing.Size(243, 20);
             this.label2.TabIndex = 3;
             this.label2.Text = "Le tue richieste in attesa o rifiutate";
-            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // label3
             // 
@@ -99,7 +97,6 @@
             this.label3.TabIndex = 4;
             this.label3.Text = "Invia richiesta di ferie per giorno ";
             this.label3.Visible = false;
-            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // button2
             // 
@@ -143,13 +140,11 @@
             this.dataGridView1.Size = new System.Drawing.Size(561, 186);
             this.dataGridView1.TabIndex = 8;
             this.dataGridView1.Visible = false;
-            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick_1);
             this.dataGridView1.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dataGridView1_CellFormatting);
             // 
             // ferieBindingSource
             // 
             this.ferieBindingSource.DataSource = typeof(APL_Project_Client.Classes.Ferie);
-            this.ferieBindingSource.CurrentChanged += new System.EventHandler(this.ferieBindingSource_CurrentChanged);
             // 
             // textBox1
             // 
@@ -168,7 +163,6 @@
             this.label4.Size = new System.Drawing.Size(137, 20);
             this.label4.TabIndex = 10;
             this.label4.Text = "Descrizione Utente";
-            this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
             // label5
             // 
@@ -179,7 +173,6 @@
             this.label5.Size = new System.Drawing.Size(358, 40);
             this.label5.TabIndex = 11;
             this.label5.Text = "Le tue richieste accettate\r\nSeleziona una data per inserire una nuova richiesta";
-            this.label5.Click += new System.EventHandler(this.label5_Click);
             // 
             // label6
             // 
@@ -191,7 +184,6 @@
             this.label6.TabIndex = 12;
             this.label6.Text = "Inserisci una motivazione";
             this.label6.Visible = false;
-            this.label6.Click += new System.EventHandler(this.label6_Click);
             // 
             // progressBar3
             // 

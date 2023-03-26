@@ -101,18 +101,18 @@ public class Dipendente
                 
                 switch (holiday.type)
                 {
-                    case StatoFerie.Richieste :
+                    case HolidayType.Pending :
                         // Aggiungo nel listato di ferie Richieste/Pendenti.
                         listRequestPending.Add(f);
                         break;
 
-                    case StatoFerie.Accettate :
+                    case HolidayType.Accepted :
                         // Aggiungo nel listato di ferie Accettate.
                         f.HolidayApproved();
                         listHolidaysAccepted.Add(f);
                         break;
 
-                    case StatoFerie.Rifiutate :
+                    case HolidayType.Refused :
                         // Aggiungo nel listato di ferie Rifiutate.
                         f.HolidayRefused();
                         listHolidaysRefused.Add(f);

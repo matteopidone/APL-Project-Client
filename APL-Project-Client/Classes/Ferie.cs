@@ -5,17 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace APL_Project_Client.Classes;
-public enum StatoFerie
-{
-    Richieste,
-    Accettate,
-    Rifiutate
-}
 public interface IFerieState
 {
     void HolidayApproved(Ferie ferie);
     void HolidayRefused(Ferie ferie);
-    StatoFerie getState();
+    HolidayType getType();
 }
 
 public class FerieRichieste : IFerieState
@@ -29,9 +23,9 @@ public class FerieRichieste : IFerieState
     {
         ferie.Stato = new FerieRifiutate();
     }
-    public StatoFerie getState()
+    public HolidayType getType()
     {
-        return StatoFerie.Richieste;
+        return HolidayType.Pending;
     }
 }
 
@@ -46,9 +40,9 @@ public class FerieAccettate : IFerieState
     {
         ferie.Stato = new FerieRifiutate();
     }
-    public StatoFerie getState()
+    public HolidayType getType()
     {
-        return StatoFerie.Accettate;
+        return HolidayType.Accepted;
     }
 }
 
@@ -63,9 +57,9 @@ public class FerieRifiutate : IFerieState
     {
         throw new InvalidOperationException("Le ferie sono già state rifiutate");
     }
-    public StatoFerie getState()
+    public HolidayType getType()
     {
-        return StatoFerie.Rifiutate;
+        return  HolidayType.Refused;
     }
 }
 
@@ -80,15 +74,15 @@ public class Ferie
     {
         get
         {
-            if (stato.getState() is StatoFerie.Richieste)
+            if (stato.getType() is HolidayType.Pending)
             {
                 return ("IN ATTESA");
             }
-            else if (stato.getState() is StatoFerie.Accettate)
+            else if (stato.getType() is HolidayType.Accepted)
             {
                 return ("ACCETTATA");
             }
-            else if (stato.getState() is StatoFerie.Rifiutate)
+            else if (stato.getType() is HolidayType.Refused)
             {
                 return ("RIFIUTATA");
             }

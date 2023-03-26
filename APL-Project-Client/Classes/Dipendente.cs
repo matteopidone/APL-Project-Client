@@ -209,7 +209,7 @@ public class Dipendente
     }
 
     // Metodo che indica se per quella data sono in ferie (Richiesta Accettata).
-    public bool isHolidayAccepted(in DateTime date)
+    public bool isHolidayAccepted(DateTime date)
     {
         if( listHolidaysAccepted.Count != 0)
         {
@@ -218,7 +218,7 @@ public class Dipendente
         return false;
     }
     // Metodo che indica se per quella data ho fatto richiesta di ferie (Richiesta Pendente).
-    public bool isHolidayPending(in DateTime date)
+    public bool isHolidayPending(DateTime date)
     {
         if (listRequestPending.Count != 0)
         {

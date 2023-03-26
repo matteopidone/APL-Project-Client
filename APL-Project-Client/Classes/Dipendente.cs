@@ -184,10 +184,10 @@ public class Dipendente
                 {
                     HolidaysPendingUpdated(this, getHolidaysPendingAndRefused());
                 }
-                // Torno true.
+
                 return true;
             }
-            // Torno false, richiesta fallita. 
+
             return false;
         }
     }

@@ -43,9 +43,7 @@ public class Dipendente
 
     // Metodo che interroga il server per il login dell'utente.
     public static async Task<LoginAPIResult> loginUser(string email, string password)
-    {
-        // Stuttura che conterrà la risposta del server.
-        LoginAPIResult r;
+    { 
         
         using ( HttpClient client = new HttpClient() )
         {
@@ -60,9 +58,8 @@ public class Dipendente
             if( response.StatusCode == System.Net.HttpStatusCode.BadRequest ) 
             {
                 //Se lo status code è 400, login fallito.
-                r = new LoginAPIResult();
-                r.found = false;
-                return r;
+                LoginAPIResult resultFailed = new LoginAPIResult();
+                return resultFailed;
             }
             if (!response.IsSuccessStatusCode)
             {
@@ -71,8 +68,10 @@ public class Dipendente
             }
             // Prendo il contenuto della risposta e lo torno al Form.
             string result = await response.Content.ReadAsStringAsync();
-            r = JsonConvert.DeserializeObject<LoginAPIResult>(result);
-            return r;
+
+            // Stuttura che conterrà la risposta del server.
+            LoginAPIResult resultSuccess = JsonConvert.DeserializeObject<LoginAPIResult>(result);
+            return resultSuccess;
         }
         
 
